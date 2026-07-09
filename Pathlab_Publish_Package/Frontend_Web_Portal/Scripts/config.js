@@ -1,4 +1,4 @@
-// ── SWAPNIL DIAGNOSTICS — CENTRAL CONFIG ─────────────────────────────────────
+// ── PATHLAB DIAGNOSTICS — CENTRAL CONFIG ─────────────────────────────────────
 // Edit ONLY this file when going live. All pages read keys from here.
 // IMPORTANT: Do NOT commit real keys to version control.
 
@@ -21,7 +21,7 @@ var SD_CONFIG = {
 
   // ── UPI ───────────────────────────────────────────────────────────────────
   // Your lab's UPI ID shown on QR code in checkout
-  UPI_ID: 'swapnil@upi',
+  UPI_ID: 'pathlab@upi',
 
   // ── WHATSAPP SUPPORT ──────────────────────────────────────────────────────
   // Include country code, no +, no spaces: 91XXXXXXXXXX

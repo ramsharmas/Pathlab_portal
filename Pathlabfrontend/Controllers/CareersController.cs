@@ -6,7 +6,7 @@ namespace Pathlabfrontend.Controllers
     {
         public ActionResult Life()
         {
-            ViewBag.Title = "Life at Swapnil Diagnostics";
+            ViewBag.Title = "Life at PATHLAB Diagnostics";
             return View();
         }
 

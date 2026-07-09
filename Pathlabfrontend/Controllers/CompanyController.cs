@@ -6,7 +6,7 @@ namespace Pathlabfrontend.Controllers
     {
         public ActionResult About()
         {
-            ViewBag.Title = "About Swapnil Diagnostics";
+            ViewBag.Title = "About PATHLAB Diagnostics";
             return View();
         }
 
@@ -30,7 +30,7 @@ namespace Pathlabfrontend.Controllers
 
         public ActionResult WhyUs()
         {
-            ViewBag.Title = "Why Swapnil Diagnostics";
+            ViewBag.Title = "Why PATHLAB Diagnostics";
             return View();
         }
 

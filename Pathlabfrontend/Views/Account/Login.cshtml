@@ -56,7 +56,7 @@
 <!-- ===== BANNER ===== -->
 <div class="banner-outer">
   <div class="banner-box">
-    <img src="@Url.Content("~/images/pathology-test-banner.png")" alt="Login – Swapnil Diagnostics">
+    <img src="@Url.Content("~/images/pathology-test-banner.png")" alt="Login – PATHLAB Diagnostics">
   </div>
 </div>
 
@@ -83,7 +83,7 @@
           </div>
           <div class="lf-terms">
             <input type="checkbox" id="lfTerms">
-            <label for="lfTerms">I agree to the <a href="@Url.Action("Terms","Info")">Terms of Use</a> &amp; <a href="@Url.Action("Privacy","Info")">Privacy Policy</a> of Swapnil Diagnostics</label>
+            <label for="lfTerms">I agree to the <a href="@Url.Action("Terms","Info")">Terms of Use</a> &amp; <a href="@Url.Action("Privacy","Info")">Privacy Policy</a> of PATHLAB Diagnostics</label>
           </div>
           <button class="lf-primary-btn" onclick="sendOTP()">
             <i class="fa fa-paper-plane"></i>&nbsp; Get OTP
@@ -300,6 +300,7 @@ async function verifyOTP(){
       const ex2=JSON.parse(localStorage.getItem('sd_user')||'null');
       if(ex2){ mirrorPortalUser(ex2); document.getElementById('lfWelcomeMsg').textContent='Welcome back, '+(ex2.FirstName||'')+'!'; }
     }
+    logLoginEvent(mobile, wcfPatientId);
     goStep(4); showToast('Logged in!','success');
     setTimeout(()=>window.location.href=nextPage,1200);
   } else if(wcfOk && wcfPatientId===0){
@@ -309,12 +310,22 @@ async function verifyOTP(){
     if(ex){
       mirrorPortalUser(ex);
       document.getElementById('lfWelcomeMsg').textContent='Welcome back, '+ex.Title+' '+ex.FirstName+'!';
+      // OTP verify itself failed to reach WCF here, so VerifyOtp never logged this
+      // server-side — this offline-fallback login would otherwise leave zero audit trail.
+      logLoginEvent(mobile, ex.WcfPatientId||0);
       goStep(4); showToast('Logged in!','success');
       setTimeout(()=>window.location.href=nextPage,1200);
     } else {
       goStep(3);
     }
   }
+}
+
+// Best-effort client-side login mirror — VerifyOtp already logs the WCF-verified
+// path server-side, this exists mainly to cover the offline-fallback branch above.
+function logLoginEvent(mobile, patientId){
+  try { LIMS.logClientEvent(mobile, patientId||null, 'Login', 'Patient', mobile, 'Patient logged in via portal.'); }
+  catch(e){}
 }
 
 // ── Step 3: Register ───────────────────────────────────────────────────────

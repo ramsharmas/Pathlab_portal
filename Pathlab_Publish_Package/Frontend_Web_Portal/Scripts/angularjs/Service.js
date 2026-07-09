@@ -1,6 +1,6 @@
 angular.module("PathlabModule")
     .service("PathlabService", function ($http) {
-        var baseUrl = "http://localhost:2091/PathlabService.svc/";
+        var baseUrl = ((typeof WCF_SERVICE_URL !== 'undefined' && WCF_SERVICE_URL) ? WCF_SERVICE_URL : "http://localhost:2091/PathlabService.svc") + "/";
 
         function post(url, data) {
             return $http({

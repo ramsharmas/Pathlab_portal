@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title>@ViewBag.Title - Swapnil Diagnostics</title>
+    <title>@ViewBag.Title - PATHLAB Diagnostics</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap" rel="stylesheet">
@@ -52,12 +52,12 @@
         <div class="burger-menu"><span></span><span></span><span></span></div>
         <div class="header-right-section">
             <div class="header-right-section-top">
-                <div class="helpline-box">Contact Us : <a href="tel:8269331264">8269331264</a></div>
-                <div class="city">BHOPAL</div>
+                <div class="helpline-box">Contact Us : <a href="tel:7050404902">7050 404 902</a></div>
+                <div class="city">KOLKATA</div>
                 <div class="header-icon-section">
                     <div class="header-icon"><a href="#" class="search-icon"></a></div>
                     <div class="header-icon"><a href="@Url.Action("Portal","Patient")" title="My Portal" class="user-icon"></a></div>
-                    <div class="header-icon"><a href="#" title="Logout" class="logout-icon"></a></div>
+                    <div class="header-icon"><a href="#" title="Logout" class="logout-icon" onclick="sessionStorage.removeItem('pathlabUser');localStorage.removeItem('sd_user');window.location.href='@Url.Action("Index","Home")';return false;"></a></div>
                     <div class="header-icon"><a href="@Url.Action("Cart","Booking")" title="Your Cart" class="cart-icon"></a></div>
                 </div>
             </div>
@@ -69,7 +69,7 @@
 <div class="menu-box-outer clearfix">
     <div class="logo-box">
         <a href="@Url.Action("Index","Home")" class="logo">
-            <img src="@Url.Content("~/images/logo.png")" alt="Swapnil Diagnostics">
+            <img src="@v("~/images/logo.png")" alt="PATHLAB Diagnostics">
         </a>
     </div>
     <div class="menu-section">
@@ -77,10 +77,10 @@
             <li><span>About Us</span>
                 <div class="sub-menu">
                     <div class="coll"><ul>
-                        <li><a href="@Url.Action("About","Company")"><span>About Swapnil Diagnostics</span></a></li>
+                        <li><a href="@Url.Action("About","Company")"><span>About PATHLAB Diagnostics</span></a></li>
                         <li><a href="@Url.Action("Management","Company")"><span>Management</span></a></li>
                         <li><a href="@Url.Action("Doctors","Company")"><span>Our Doctors</span></a></li>
-                        <li><a href="@Url.Action("WhyUs","Company")"><span>Why Swapnil Diagnostics</span></a></li>
+                        <li><a href="@Url.Action("WhyUs","Company")"><span>Why PATHLAB Diagnostics</span></a></li>
                         <li><a href="@Url.Action("Accreditations","Company")"><span>Accreditations</span></a></li>
                     </ul></div>
                     <div class="coll"><ul>
@@ -154,7 +154,7 @@
     <div class="footer">
         <div class="footer-logo-box clearfix">
             <div class="footer-logo">
-                <a href="@Url.Action("Index","Home")"><img src="@Url.Content("~/images/footer-logo.png")" alt="Swapnil Diagnostics"></a>
+                <a href="@Url.Action("Index","Home")"><img src="@v("~/images/footer-logo.png")" alt="PATHLAB Diagnostics"></a>
             </div>
             <div class="footer-logo-right">
                 <div class="helpline-box">Contact Us : <a href="tel:8269331264">8269331264</a></div>
@@ -164,10 +164,10 @@
             <ul class="footer-nav-container">
                 <li class="nav-col">About Us
                     <ul class="footer-accordian">
-                        <li><a href="@Url.Action("About","Company")">About Swapnil Diagnostics</a></li>
+                        <li><a href="@Url.Action("About","Company")">About PATHLAB Diagnostics</a></li>
                         <li><a href="@Url.Action("Management","Company")">Management</a></li>
                         <li><a href="@Url.Action("Doctors","Company")">Doctors</a></li>
-                        <li><a href="@Url.Action("WhyUs","Company")">Why Swapnil Diagnostics</a></li>
+                        <li><a href="@Url.Action("WhyUs","Company")">Why PATHLAB Diagnostics</a></li>
                         <li><a href="@Url.Action("Accreditations","Company")">Accreditations</a></li>
                         <li><a href="@Url.Action("Network","Company")">Network</a></li>
                         <li><a href="@Url.Action("Newsroom","Company")">Newsroom</a></li>
@@ -213,7 +213,7 @@
                 </li>
                 <li class="nav-col">Careers
                     <ul class="footer-accordian">
-                        <li><a href="@Url.Action("Life","Careers")">Life at Swapnil Diagnostics</a></li>
+                        <li><a href="@Url.Action("Life","Careers")">Life at PATHLAB Diagnostics</a></li>
                         <li><a href="@Url.Action("Opportunities","Careers")">Current Opportunities</a></li>
                     </ul>
                 </li>
@@ -233,11 +233,12 @@
                 <li><a href="@Url.Action("Logistics","Info")">Logistics and IT</a></li>
             </ul>
         </div>
-        <div class="copy-right"><p>2025 &copy; Swapnil Diagnostics. All rights reserved.</p></div>
+        <div class="copy-right"><p>2025 &copy; PATHLAB Diagnostics. All rights reserved.</p></div>
     </div>
 </div>
 
 <script src="@Url.Content("~/Scripts/config.js")"></script>
+<script src="@Url.Content("~/Scripts/ga4.js")"></script>
 <script src="@Url.Content("~/Scripts/sd-notify.js")"></script>
 <script src="@Url.Content("~/Scripts/custom.js")"></script>
 @RenderSection("scripts", required: false)

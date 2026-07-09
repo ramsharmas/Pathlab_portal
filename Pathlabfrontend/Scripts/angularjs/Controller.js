@@ -50,6 +50,17 @@ function sdClearUser() {
     localStorage.removeItem("sd_user");
 }
 
+// ======================== GA4 BOOKING-FUNNEL EVENTS ========================
+// Thin wrapper so every call site stays a one-liner and never throws when
+// ga4.js hasn't defined SDAnalytics yet (script load order edge cases) or GA
+// isn't configured (SDAnalytics.trackEvent itself no-ops in that case).
+function trackGa(name, params) {
+    if (window.SDAnalytics) window.SDAnalytics.trackEvent(name, params);
+}
+function gaItem(t) {
+    return { item_id: t.TestSuiteID || t.TestId, item_name: t.TestSuiteName, price: t.Price, item_category: t.TestType || "Test" };
+}
+
 // ======================== HOME CONTROLLER ========================
 angular.module("PathlabModule")
     .controller("HomeController", function ($scope, $window, PathlabService) {
@@ -109,6 +120,7 @@ angular.module("PathlabModule")
             var exists = cart.some(function (t) { return t.TestSuiteID === entry.TestSuiteID; });
             if (!exists) cart.push(entry);
             sessionStorage.setItem("sd_cart", JSON.stringify(cart));
+            trackGa("add_to_cart", { currency: "INR", value: entry.Price, items: [gaItem(entry)] });
             $window.location.href = APP_ROOT + "Booking/Cart";
         };
 
@@ -173,6 +185,7 @@ angular.module("PathlabModule")
             r.data.forEach(function (t) { if (t.Category) cats[t.Category] = true; });
             $scope.categories = Object.keys(cats);
             $scope.isLoading = false;
+            trackGa("view_item_list", { item_list_name: "Test Catalogue", items: r.data.slice(0, 20).map(gaItem) });
         });
 
         // Saved cart (Cart & Checkout Phase 4) — survives a device switch. Only
@@ -233,6 +246,7 @@ angular.module("PathlabModule")
             } else {
                 $scope.cart.push(t);
                 showToast(t.TestSuiteName + " added to cart");
+                trackGa("add_to_cart", { currency: "INR", value: t.Price, items: [gaItem(t)] });
             }
             sessionStorage.setItem("sd_cart", JSON.stringify($scope.cart));
         };
@@ -264,6 +278,13 @@ angular.module("PathlabModule")
     .controller("CheckoutController", function ($scope, $window, PathlabService) {
         $scope.step = 1;
         $scope.cart = JSON.parse(sessionStorage.getItem("sd_cart") || "[]");
+        if ($scope.cart.length) {
+            trackGa("begin_checkout", {
+                currency: "INR",
+                value: $scope.cart.reduce(function (s, t) { return s + t.Price; }, 0),
+                items: $scope.cart.map(gaItem)
+            });
+        }
         $scope.collectionType = "walkin";
         $scope.payMethod = "";
         $scope.isProcessing = false;
@@ -382,7 +403,7 @@ angular.module("PathlabModule")
                     key: SD_CONFIG.RAZORPAY_KEY_ID,
                     amount: $scope.total() * 100, // paise
                     currency: "INR",
-                    name: "Swapnil Diagnostics",
+                    name: "PATHLAB Diagnostics",
                     description: "Lab test booking",
                     prefill: { name: $scope.patient.FullName, contact: $scope.patient.Phone, email: $scope.patient.Email || "" },
                     theme: { color: "#632c76" },
@@ -442,6 +463,10 @@ angular.module("PathlabModule")
                     $scope.confirmedRef = r.data.BookingRef;
                     $scope.confirmedSampleId = r.data.SampleId;
                     $scope.step = 3;
+                    trackGa("purchase", {
+                        transaction_id: r.data.BookingRef, currency: "INR",
+                        value: $scope.total(), items: $scope.cart.map(gaItem)
+                    });
                     sessionStorage.removeItem("sd_cart");
                     sessionStorage.removeItem("sd_collection");
                     buildWhatsAppLink(r.data.BookingRef, paymentId);
@@ -462,7 +487,7 @@ angular.module("PathlabModule")
             var payLine = $scope.payMethod === "counter"
                 ? "Payment: Rs." + $scope.total() + " due at counter."
                 : "Paid: Rs." + $scope.total() + (paymentId ? " (Txn " + paymentId + ")" : "") + ".";
-            var msg = "Swapnil Diagnostics: Booking " + ref + " confirmed for " +
+            var msg = "PATHLAB Diagnostics: Booking " + ref + " confirmed for " +
                 $scope.collectionDate + " " + $scope.timeSlot + ". " + payLine +
                 " Track your sample at " + window.location.origin + APP_ROOT + "Patient/TrackSample";
             $scope.waConfirmLink = SDNotify.whatsappLink(msg);
@@ -527,6 +552,49 @@ angular.module("PathlabModule")
         }
 
         $scope.setTab = function (tab) { $scope.activeTab = tab; };
+
+        // ── Book a Test (from inside the portal) — same catalogue + single
+        // Test Suite dropdown as Views/Test/BookTest.cshtml, so patients don't
+        // have to leave the portal to add tests; cart writes to the same
+        // sessionStorage keys the standalone Cart page and quick re-book use.
+        $scope.bookCatalogue = [];
+        $scope.bookLoading = false;
+        $scope.selectedSuiteId = "";
+        $scope.selectedSuite = function () {
+            if (!$scope.selectedSuiteId) return null;
+            return $scope.bookCatalogue.filter(function (t) { return t.TestSuiteID === $scope.selectedSuiteId; })[0] || null;
+        };
+        function loadBookCatalogue() {
+            if ($scope.bookCatalogue.length || $scope.bookLoading) return;
+            $scope.bookLoading = true;
+            PathlabService.getAllTests().then(function (r) {
+                $scope.bookCatalogue = r.data || [];
+                $scope.bookLoading = false;
+            }, function () { $scope.bookLoading = false; });
+        }
+        $scope.portalCart = JSON.parse(sessionStorage.getItem("sd_cart") || "[]");
+        $scope.isInPortalCart = function (t) {
+            return !!t && $scope.portalCart.some(function (c) { return c.TestSuiteID === t.TestSuiteID; });
+        };
+        $scope.addSuiteToCart = function (t) {
+            if (!t || $scope.isInPortalCart(t)) return;
+            $scope.portalCart.push(t);
+            ["cart", "sd_cart"].forEach(function (key) { sessionStorage.setItem(key, JSON.stringify($scope.portalCart)); });
+            showToast(t.TestSuiteName + " added to cart", "success");
+        };
+        $scope.removeSuiteFromCart = function (t) {
+            $scope.portalCart = $scope.portalCart.filter(function (c) { return c.TestSuiteID !== t.TestSuiteID; });
+            ["cart", "sd_cart"].forEach(function (key) { sessionStorage.setItem(key, JSON.stringify($scope.portalCart)); });
+        };
+        $scope.portalCartTotal = function () {
+            return $scope.portalCart.reduce(function (s, t) { return s + (t.Price || 0); }, 0);
+        };
+        var origSetTab = $scope.setTab;
+        $scope.setTab = function (tab) {
+            origSetTab(tab);
+            if (tab === "book") loadBookCatalogue();
+        };
+        if ($scope.activeTab === "book") loadBookCatalogue();
 
         // Login/registration happens on the single Account/Login page (see the
         // Auth Gate link in Portal.cshtml) — this controller only ever reads the
@@ -694,7 +762,7 @@ angular.module("PathlabModule")
             var html = "<html><head><title>Invoice " + b.BookingRef + "</title>" +
                 "<style>body{font-family:Arial,sans-serif;padding:30px;color:#222}h1{color:#632c76;font-size:20px}table{width:100%;border-collapse:collapse;margin-top:16px}td,th{padding:8px;border-bottom:1px solid #eee}.tot{font-weight:700;font-size:16px;color:#632c76}</style>" +
                 "</head><body>" +
-                "<h1>Swapnil Diagnostics — Invoice</h1>" +
+                "<h1>PATHLAB Diagnostics — Invoice</h1>" +
                 header +
                 "<strong>Payment Method:</strong> " + (b.PaymentMethod || "-") + "<br>" +
                 "<strong>Payment Status:</strong> " + (b.PaymentStatus || "-") + "</p>" +
@@ -716,26 +784,25 @@ angular.module("PathlabModule")
                 printInvoice(b, null);
             });
         };
-        // Settles an existing Pending booking in place (gateway → UpdatePaymentStatus)
-        // rather than routing back through Checkout, which would re-create the booking.
-        $scope.payNow = function (b) {
+        // Opens Razorpay for a given amount against a booking (full or partial),
+        // falling back to a simulated gateway callback when no live key is
+        // configured — shared by payNow (full amount) and payPartial below.
+        function openRazorpayPayment(b, amount, description, onGatewaySuccess) {
             var key = ($window.SD_CONFIG && $window.SD_CONFIG.RAZORPAY_KEY_ID) || "";
             if (!key || key.indexOf("YOUR_") !== -1) {
-                // Demo mode — no gateway configured: simulate the gateway callback
-                // so the settlement flow stays demonstrable end-to-end.
-                settlePayment(b, "DEMO-" + Date.now());
+                onGatewaySuccess("DEMO-" + Date.now());
                 return;
             }
             var open = function () {
                 new Razorpay({
                     key: key,
-                    amount: Math.round(b.TotalAmount * 100), // paise
+                    amount: Math.round(amount * 100), // paise
                     currency: "INR",
-                    name: "Swapnil Diagnostics",
-                    description: "Booking " + b.BookingRef,
+                    name: "PATHLAB Diagnostics",
+                    description: description,
                     prefill: { name: $scope.currentUser.FullName, contact: $scope.currentUser.Phone, email: $scope.currentUser.Email || "" },
                     theme: { color: "#632c76" },
-                    handler: function (resp) { $scope.$apply(function () { settlePayment(b, resp.razorpay_payment_id); }); }
+                    handler: function (resp) { $scope.$apply(function () { onGatewaySuccess(resp.razorpay_payment_id); }); }
                 }).open();
             };
             if ($window.Razorpay) { open(); return; }
@@ -744,11 +811,33 @@ angular.module("PathlabModule")
             s.onload = open;
             s.onerror = function () { $scope.$apply(function () { showToast("Payment gateway failed to load. Please try again.", "error"); }); };
             document.body.appendChild(s);
+        }
+        // Settles an existing Pending booking in place (gateway → UpdatePaymentStatus)
+        // rather than routing back through Checkout, which would re-create the booking.
+        $scope.payNow = function (b) {
+            openRazorpayPayment(b, b.TotalAmount - (b.AmountPaid || 0), "Booking " + b.BookingRef, function (txnId) {
+                settlePayment(b, txnId, null);
+            });
         };
-        function settlePayment(b, txnId) {
-            PathlabService.updatePaymentStatus(b.BookingRef, "Paid", "online", txnId, "Portal").then(function (r) {
+        // Part-payment installment paid online by the patient (Billing Phase 3,
+        // patient-facing counterpart to the front-desk "Part" control in Admin).
+        $scope.payPartial = function (b) {
+            var remaining = b.TotalAmount - (b.AmountPaid || 0);
+            var amount = Number(b._partialAmount);
+            if (!amount || amount <= 0 || amount >= remaining) {
+                showToast("Enter an amount less than the remaining balance (Rs." + remaining + ")", "error");
+                return;
+            }
+            openRazorpayPayment(b, amount, "Booking " + b.BookingRef + " (partial)", function (txnId) {
+                settlePayment(b, txnId, amount);
+                b._partialAmount = "";
+            });
+        };
+        function settlePayment(b, txnId, partialAmount) {
+            PathlabService.updatePaymentStatus(b.BookingRef, partialAmount ? "PartiallyPaid" : "Paid", "online", txnId, "Portal", partialAmount || null).then(function (r) {
                 if (r.data && r.data.Success) {
-                    b.PaymentStatus = "Paid";
+                    b.PaymentStatus = r.data.PaymentStatus || (partialAmount ? "PartiallyPaid" : "Paid");
+                    b.AmountPaid = r.data.AmountPaid;
                     showToast("Payment recorded for " + b.BookingRef, "success");
                 } else {
                     showToast((r.data && r.data.Message) || "Payment update failed", "error");
@@ -757,6 +846,33 @@ angular.module("PathlabModule")
                 showToast("Unable to reach service. Please try again.", "error");
             });
         }
+
+        // ── Patient-initiated refund requests (Billing Phase 3) ──
+        // RefundPayment is a bookkeeping call that immediately marks a booking
+        // "Refunded" and SMSes the patient — it assumes the money has already
+        // moved via the gateway/counter. A patient can't trigger that directly
+        // (there's no real reversal behind it), so this only records a request
+        // for staff to action via the existing Admin > Bookings refund control;
+        // it never flips PaymentStatus itself.
+        var REFUND_REQ_KEY = "sd_refund_requests";
+        function refundRequests() { return JSON.parse(localStorage.getItem(REFUND_REQ_KEY) || "[]"); }
+        $scope.isRefundRequested = function (b) { return refundRequests().indexOf(b.BookingRef) !== -1; };
+        $scope.requestRefund = function (b) {
+            if ($scope.isRefundRequested(b)) return;
+            var max = b.AmountPaid || b.TotalAmount;
+            var reason = $window.prompt("Why are you requesting a refund for " + b.BookingRef + "? (optional)", "") || "";
+            if (reason === null) return;
+            PathlabService.logClientEvent($scope.currentUser.Phone, $scope.currentUser.PatientId,
+                "RefundRequested", "Booking", b.BookingRef,
+                "Patient requested a refund (paid Rs." + max + "). Reason: " + (reason || "not given")).then(function () {
+                var reqs = refundRequests();
+                reqs.push(b.BookingRef);
+                localStorage.setItem(REFUND_REQ_KEY, JSON.stringify(reqs));
+                showToast("Refund requested — our team will review and process it within 2-3 business days.", "success");
+            }, function () {
+                showToast("Unable to reach service. Please try again.", "error");
+            });
+        };
 
         // ── Notifications ──
         $scope.unreadCount = 0;
@@ -829,7 +945,7 @@ angular.module("PathlabModule")
                     if (seenNotifIds.indexOf(n.NotificationLogId) !== -1) return;
                     seenNotifIds.push(n.NotificationLogId);
                     if (!isFirstLoad) {
-                        var style = NOTIF_STYLES[n.Type] || { title: "Swapnil Diagnostics" };
+                        var style = NOTIF_STYLES[n.Type] || { title: "PATHLAB Diagnostics" };
                         new Notification(style.title, { body: n.Message, icon: "/favicon.ico" });
                     }
                 });
@@ -985,7 +1101,7 @@ angular.module("PathlabModule")
             $scope.dlPanel = { visible: true, ref: r.BookingRef, path: r.ReportFilePath, code: code, entered: "", error: "", live: live };
             $scope.sharePanel.visible = false;
             if (window.SDNotify && $scope.currentUser) {
-                SDNotify.sendSms($scope.currentUser.Phone, "Your OTP to download report " + r.BookingRef + " is " + code + ". Do not share it. - Swapnil Diagnostics");
+                SDNotify.sendSms($scope.currentUser.Phone, "Your OTP to download report " + r.BookingRef + " is " + code + ". Do not share it. - PATHLAB Diagnostics");
             }
         };
         $scope.verifyReportOtp = function () {
@@ -1534,6 +1650,24 @@ angular.module("PathlabModule")
             });
         };
 
+        // Lab-staff ingestion of a finished report (Report Delivery Phase 2) —
+        // the only thing that ever unlocks the patient's Download/Share buttons
+        // in My Reports, since ReportFilePath otherwise stays null forever.
+        $scope.attachReport = function (booking) {
+            var path = $window.prompt(
+                "Report file path/URL for " + booking.BookingRef + ":",
+                "/images/pathlab-brochure.pdf");
+            if (!path) return;
+            PathlabService.attachReport(booking.BookingRef, path, "Staff").then(function (r) {
+                if (r.data && r.data.Success) {
+                    booking.BookingStatus = "Ready";
+                    showToast("Report attached — patient can now download it", "success");
+                } else {
+                    showToast((r.data && r.data.Message) || "Could not attach report", "error");
+                }
+            }, function () { showToast("Unable to reach service. Please try again.", "error"); });
+        };
+
         // Front-desk settlement of a pay-at-counter booking.
         $scope.markPaid = function (booking) {
             PathlabService.updatePaymentStatus(booking.BookingRef, "Paid", booking.PaymentMethod || "counter", null, "FrontDesk").then(function (r) {
@@ -1586,6 +1720,39 @@ angular.module("PathlabModule")
         // initial load
         $scope.loadStats();
         loadLimsSyncStatus();
+    });
+
+// ======================== PHLEBOTOMIST CONTROLLER ========================
+// Standalone mobile-first collection queue (Sample Collection Phase 3) — the
+// same data/actions as Admin > Collection Queue, but on its own PIN-gated
+// page (Staff/Collection) so a field phlebotomist never sees the rest of
+// the Admin Dashboard.
+angular.module("PathlabModule")
+    .controller("PhlebotomistController", function ($scope, PathlabService) {
+        $scope.collectionQueue = [];
+        $scope.isLoadingQueue = false;
+
+        $scope.loadCollectionQueue = function () {
+            $scope.isLoadingQueue = true;
+            PathlabService.getCollectionQueue().then(function (r) {
+                $scope.collectionQueue = r.data || [];
+                $scope.isLoadingQueue = false;
+            }, function () { $scope.isLoadingQueue = false; });
+        };
+
+        $scope.markCollected = function (item) {
+            PathlabService.updateSampleStatus(item.BookingRef, "1").then(function (r) {
+                if (r.data && r.data.Success) {
+                    $scope.collectionQueue = $scope.collectionQueue.filter(function (q) { return q.BookingRef !== item.BookingRef; });
+                    PathlabService.logCustodyEvent(item.BookingRef, item._handlerName || "Phlebotomist", "Phlebotomist", "Collected", item.Address, null);
+                    showToast("Marked collected: " + item.BookingRef, "success");
+                } else {
+                    showToast((r.data && r.data.Message) || "Update failed", "error");
+                }
+            });
+        };
+
+        $scope.loadCollectionQueue();
     });
 
 // ======================== SHARED TOAST ========================

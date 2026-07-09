@@ -382,7 +382,7 @@ angular.module("PathlabModule")
                     key: SD_CONFIG.RAZORPAY_KEY_ID,
                     amount: $scope.total() * 100, // paise
                     currency: "INR",
-                    name: "Swapnil Diagnostics",
+                    name: "PATHLAB Diagnostics",
                     description: "Lab test booking",
                     prefill: { name: $scope.patient.FullName, contact: $scope.patient.Phone, email: $scope.patient.Email || "" },
                     theme: { color: "#632c76" },
@@ -462,7 +462,7 @@ angular.module("PathlabModule")
             var payLine = $scope.payMethod === "counter"
                 ? "Payment: Rs." + $scope.total() + " due at counter."
                 : "Paid: Rs." + $scope.total() + (paymentId ? " (Txn " + paymentId + ")" : "") + ".";
-            var msg = "Swapnil Diagnostics: Booking " + ref + " confirmed for " +
+            var msg = "PATHLAB Diagnostics: Booking " + ref + " confirmed for " +
                 $scope.collectionDate + " " + $scope.timeSlot + ". " + payLine +
                 " Track your sample at " + window.location.origin + APP_ROOT + "Patient/TrackSample";
             $scope.waConfirmLink = SDNotify.whatsappLink(msg);
@@ -694,7 +694,7 @@ angular.module("PathlabModule")
             var html = "<html><head><title>Invoice " + b.BookingRef + "</title>" +
                 "<style>body{font-family:Arial,sans-serif;padding:30px;color:#222}h1{color:#632c76;font-size:20px}table{width:100%;border-collapse:collapse;margin-top:16px}td,th{padding:8px;border-bottom:1px solid #eee}.tot{font-weight:700;font-size:16px;color:#632c76}</style>" +
                 "</head><body>" +
-                "<h1>Swapnil Diagnostics — Invoice</h1>" +
+                "<h1>PATHLAB Diagnostics — Invoice</h1>" +
                 header +
                 "<strong>Payment Method:</strong> " + (b.PaymentMethod || "-") + "<br>" +
                 "<strong>Payment Status:</strong> " + (b.PaymentStatus || "-") + "</p>" +
@@ -731,7 +731,7 @@ angular.module("PathlabModule")
                     key: key,
                     amount: Math.round(b.TotalAmount * 100), // paise
                     currency: "INR",
-                    name: "Swapnil Diagnostics",
+                    name: "PATHLAB Diagnostics",
                     description: "Booking " + b.BookingRef,
                     prefill: { name: $scope.currentUser.FullName, contact: $scope.currentUser.Phone, email: $scope.currentUser.Email || "" },
                     theme: { color: "#632c76" },
@@ -829,7 +829,7 @@ angular.module("PathlabModule")
                     if (seenNotifIds.indexOf(n.NotificationLogId) !== -1) return;
                     seenNotifIds.push(n.NotificationLogId);
                     if (!isFirstLoad) {
-                        var style = NOTIF_STYLES[n.Type] || { title: "Swapnil Diagnostics" };
+                        var style = NOTIF_STYLES[n.Type] || { title: "PATHLAB Diagnostics" };
                         new Notification(style.title, { body: n.Message, icon: "/favicon.ico" });
                     }
                 });
@@ -985,7 +985,7 @@ angular.module("PathlabModule")
             $scope.dlPanel = { visible: true, ref: r.BookingRef, path: r.ReportFilePath, code: code, entered: "", error: "", live: live };
             $scope.sharePanel.visible = false;
             if (window.SDNotify && $scope.currentUser) {
-                SDNotify.sendSms($scope.currentUser.Phone, "Your OTP to download report " + r.BookingRef + " is " + code + ". Do not share it. - Swapnil Diagnostics");
+                SDNotify.sendSms($scope.currentUser.Phone, "Your OTP to download report " + r.BookingRef + " is " + code + ". Do not share it. - PATHLAB Diagnostics");
             }
         };
         $scope.verifyReportOtp = function () {

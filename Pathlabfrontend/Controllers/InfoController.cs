@@ -12,7 +12,7 @@ namespace Pathlabfrontend.Controllers
 
         public ActionResult BlogPost()
         {
-            ViewBag.Title = "Life at Swapnil Diagnostics";
+            ViewBag.Title = "Life at PATHLAB Diagnostics";
             return View();
         }
 

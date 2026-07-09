@@ -130,6 +130,7 @@
     <Compile Include="Controllers\InfoController.cs" />
     <Compile Include="Controllers\PartnerController.cs" />
     <Compile Include="Controllers\PatientController.cs" />
+    <Compile Include="Controllers\StaffController.cs" />
     <Compile Include="Controllers\TestController.cs" />
     <Compile Include="Models\Booking.cs" />
     <Compile Include="Models\HealthPackage.cs" />
@@ -213,6 +214,7 @@
     <Content Include="Views\Patient\Feedback.cshtml" />
     <Content Include="Views\Patient\Portal.cshtml" />
     <Content Include="Views\Patient\TrackSample.cshtml" />
+    <Content Include="Views\Staff\Collection.cshtml" />
     <Content Include="Views\Test\BookTest.cshtml" />
     <Content Include="Views\Test\CbcTest.cshtml" />
     <Content Include="Views\Test\CovidPackages.cshtml" />
@@ -234,6 +236,7 @@
     <Content Include="Scripts\lims-api.js" />
     <Content Include="Scripts\pathlab.js" />
     <Content Include="Scripts\sd-notify.js" />
+    <Content Include="Scripts\ga4.js" />
     <Content Include="Scripts\slick.js" />
     <Content Include="Scripts\angularjs\Controller.js" />
     <Content Include="Scripts\angularjs\Module.js" />

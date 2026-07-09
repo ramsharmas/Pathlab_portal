@@ -13,6 +13,6 @@ C:\Users\Mudit\Desktop\PathlabPortal\WcfPathlabService\bin\EntityFramework.xml
 C:\Users\Mudit\Desktop\PathlabPortal\WcfPathlabService\bin\EntityFramework.SqlServer.xml
 C:\Users\Mudit\Desktop\PathlabPortal\WcfPathlabService\obj\Release\PathlabWcfService.csproj.AssemblyReference.cache
 C:\Users\Mudit\Desktop\PathlabPortal\WcfPathlabService\obj\Release\PathlabWcfService.csproj.CoreCompileInputs.cache
-C:\Users\Mudit\Desktop\PathlabPortal\WcfPathlabService\obj\Release\PathlabW.6A72FA9E.Up2Date
 C:\Users\Mudit\Desktop\PathlabPortal\WcfPathlabService\obj\Release\PathlabWcfService.dll
 C:\Users\Mudit\Desktop\PathlabPortal\WcfPathlabService\obj\Release\PathlabWcfService.pdb
+C:\Users\Mudit\Desktop\PathlabPortal\WcfPathlabService\obj\Release\PathlabWcfService.csproj.CopyComplete

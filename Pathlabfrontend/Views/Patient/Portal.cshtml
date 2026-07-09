@@ -93,6 +93,7 @@
             <p>{{currentUser.Phone}}</p>
         </div>
         <div class="sd-sidebar-item" data-ng-class="{active:activeTab=='dashboard'}" data-ng-click="setTab('dashboard')"><i class="fa fa-tachometer"></i> Dashboard</div>
+        <div class="sd-sidebar-item" data-ng-class="{active:activeTab=='book'}" data-ng-click="setTab('book')"><i class="fa fa-plus-circle"></i> Book a Test</div>
         <div class="sd-sidebar-item" data-ng-class="{active:activeTab=='bookings'}" data-ng-click="setTab('bookings')"><i class="fa fa-calendar-check-o"></i> My Bookings</div>
         <div class="sd-sidebar-item" data-ng-class="{active:activeTab=='track'}" data-ng-click="setTab('track')"><i class="fa fa-map-marker"></i> Track Sample</div>
         <div class="sd-sidebar-item" data-ng-class="{active:activeTab=='reports'}" data-ng-click="setTab('reports')"><i class="fa fa-file-text-o"></i> My Reports</div>
@@ -164,6 +165,63 @@
                     <div class="sd-track-step" data-ng-class="dashStepClass(1)"><div class="sd-track-dot"><i class="fa fa-check" data-ng-show="dashStep>1"></i><span data-ng-show="dashStep<=1">2</span></div><div class="sd-track-lbl">Collected</div></div>
                     <div class="sd-track-step" data-ng-class="dashStepClass(2)"><div class="sd-track-dot"><i class="fa fa-check" data-ng-show="dashStep>2"></i><span data-ng-show="dashStep<=2">3</span></div><div class="sd-track-lbl">Processing</div></div>
                     <div class="sd-track-step" data-ng-class="dashStepClass(3)"><div class="sd-track-dot"><i class="fa fa-check" data-ng-show="dashStep>=3"></i><span data-ng-show="dashStep<3">4</span></div><div class="sd-track-lbl">Ready</div></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- BOOK A TEST -->
+        <div data-ng-show="activeTab=='book'">
+            <div class="sd-portal-card">
+                <h2><i class="fa fa-plus-circle"></i> Book a Test</h2>
+                <div data-ng-show="recentTests.length>0" style="margin-bottom:18px">
+                    <div style="font-size:12px;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">Quick Re-book</div>
+                    <div style="display:flex;gap:8px;flex-wrap:wrap">
+                        <button data-ng-repeat="t in recentTests" class="sd-btn-outline" style="padding:7px 14px;font-size:12px" data-ng-click="quickRebook(t)">
+                            <i class="fa fa-repeat"></i> {{t.TestSuiteName}} — &#8377;{{t.Price}}
+                        </button>
+                    </div>
+                </div>
+                <label style="display:block;font-weight:700;color:#632c76;font-size:14px;margin-bottom:8px"><i class="fa fa-list"></i> Select Test Suite</label>
+                <div data-ng-show="bookLoading" style="color:#888;font-size:13px"><i class="fa fa-spinner fa-spin"></i> Loading catalogue…</div>
+                <select data-ng-hide="bookLoading" style="width:100%;padding:12px 14px;border:1.5px solid #ddd;border-radius:8px;font-size:15px;font-family:inherit;background:#fff"
+                        data-ng-model="selectedSuiteId"
+                        data-ng-options="t.TestSuiteID as (t.TestSuiteName + ' — ₹' + t.Price) for t in bookCatalogue">
+                    <option value="">-- Select Test Suite --</option>
+                </select>
+                <div data-ng-show="selectedSuite()" style="border:1.5px solid #632c76;border-radius:12px;padding:18px;margin-top:12px;background:#faf5ff">
+                    <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap">
+                        <div>
+                            <div style="font-size:17px;font-weight:700;color:#222">{{selectedSuite().TestSuiteName}}</div>
+                            <div style="font-size:13px;color:#666;margin-top:8px;line-height:2">
+                                <i class="fa fa-tint" style="color:#632c76"></i> Sample: <strong>{{selectedSuite().SampleType}}</strong><br>
+                                <i class="fa fa-flask" style="color:#632c76"></i> Includes: <strong>{{selectedSuite().TestCount}} test parameter(s)</strong><br>
+                                <i class="fa fa-cutlery" style="color:#632c76"></i> Fasting:
+                                <strong data-ng-show="selectedSuite().FastingRequired" style="color:#e67e22">Required (8–12 hours)</strong>
+                                <strong data-ng-hide="selectedSuite().FastingRequired" style="color:#2e7d32">Not required</strong>
+                            </div>
+                        </div>
+                        <div style="text-align:right">
+                            <div class="sd-test-price" style="font-size:22px;font-weight:700;color:#632c76">&#8377;{{selectedSuite().Price}}</div>
+                            <button class="sd-btn-purple" style="margin-top:10px" data-ng-click="addSuiteToCart(selectedSuite())" data-ng-disabled="isInPortalCart(selectedSuite())">
+                                <i class="fa" data-ng-class="isInPortalCart(selectedSuite()) ? 'fa-check' : 'fa-cart-plus'"></i>
+                                {{isInPortalCart(selectedSuite()) ? 'Added to Cart' : 'Add to Cart'}}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div data-ng-show="portalCart.length>0" style="margin-top:22px;border-top:1px solid #f0e8f0;padding-top:16px">
+                    <div style="font-size:12px;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">In Your Cart ({{portalCart.length}})</div>
+                    <div data-ng-repeat="c in portalCart" style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid #f5f0fa;font-size:13px">
+                        <span>{{c.TestSuiteName}}</span>
+                        <span style="display:flex;align-items:center;gap:10px">
+                            <strong style="color:#632c76">&#8377;{{c.Price}}</strong>
+                            <button class="sd-remove-btn" style="background:none;border:none;color:#e53e3e;cursor:pointer" data-ng-click="removeSuiteFromCart(c)"><i class="fa fa-times"></i></button>
+                        </span>
+                    </div>
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin-top:14px">
+                        <div style="font-size:14px;font-weight:700">Subtotal: &#8377;{{portalCartTotal()}}</div>
+                        <a class="sd-btn-purple" href="@Url.Action("Cart","Booking")"><i class="fa fa-shopping-cart"></i> Go to Cart</a>
+                    </div>
                 </div>
             </div>
         </div>
@@ -297,12 +355,24 @@
                             <td><strong style="color:#632c76">{{b.BookingRef}}</strong></td>
                             <td>{{b.CreatedAt | date:'dd MMM yy'}}</td>
                             <td>{{b.Tests.length}}</td>
-                            <td>&#8377;{{b.TotalAmount}}</td>
+                            <td>
+                                &#8377;{{b.TotalAmount}}
+                                <div data-ng-show="b.PaymentStatus=='PartiallyPaid'" style="font-size:11px;color:#e65100">&#8377;{{b.AmountPaid}} paid</div>
+                                <div data-ng-show="b.PaymentStatus=='Refunded'" style="font-size:11px;color:#c62828">&#8377;{{b.RefundAmount}} refunded</div>
+                            </td>
                             <td style="text-transform:capitalize">{{b.PaymentMethod || 'Counter'}}</td>
-                            <td><span class="sd-status-badge" data-ng-class="b.PaymentStatus=='Paid'?'status-paid':'status-pending'">{{b.PaymentStatus || 'Pending'}}</span></td>
+                            <td>
+                                <span class="sd-status-badge" data-ng-class="{'status-paid':b.PaymentStatus=='Paid', 'status-pending':(!b.PaymentStatus||b.PaymentStatus=='Pending'||b.PaymentStatus=='PartiallyPaid')}" data-ng-style="b.PaymentStatus=='Refunded' && {'background':'#fdecea','color':'#c62828'}">{{b.PaymentStatus || 'Pending'}}</span>
+                            </td>
                             <td style="white-space:nowrap">
                                 <button class="sd-btn-outline" style="padding:5px 12px;font-size:12px" data-ng-click="downloadInvoice(b)"><i class="fa fa-download"></i> Invoice</button>
-                                <button class="sd-btn-purple" style="padding:5px 12px;font-size:12px;margin-left:4px" data-ng-show="b.PaymentStatus!='Paid'" data-ng-click="payNow(b)"><i class="fa fa-credit-card"></i> Pay Now</button>
+                                <button class="sd-btn-purple" style="padding:5px 12px;font-size:12px;margin-left:4px" data-ng-show="b.PaymentStatus!='Paid' && b.PaymentStatus!='Refunded'" data-ng-click="payNow(b)"><i class="fa fa-credit-card"></i> Pay Now</button>
+                                <button class="sd-btn-outline" style="padding:5px 12px;font-size:12px;margin-left:4px;color:#c62828;border-color:#c62828" data-ng-show="(b.PaymentStatus=='Paid' || b.PaymentStatus=='PartiallyPaid') && !isRefundRequested(b)" data-ng-click="requestRefund(b)"><i class="fa fa-undo"></i> Request Refund</button>
+                                <span data-ng-show="isRefundRequested(b)" style="font-size:11px;color:#e65100;display:inline-block;margin-left:4px"><i class="fa fa-clock-o"></i> Refund requested</span>
+                                <div data-ng-show="b.PaymentStatus=='Pending' || b.PaymentStatus=='PartiallyPaid'" style="display:flex;gap:4px;margin-top:6px;align-items:center">
+                                    <input type="number" data-ng-model="b._partialAmount" placeholder="Part amt" style="width:80px;padding:5px 8px;border:1px solid #ddd;border-radius:6px;font-size:12px">
+                                    <button class="sd-btn-outline" style="padding:5px 10px;font-size:12px" data-ng-click="payPartial(b)">Pay Partial</button>
+                                </div>
                             </td>
                         </tr>
                     </tbody>
@@ -456,7 +526,7 @@
                     <div style="display:flex;gap:12px;flex-wrap:wrap">
                         <a href="tel:8269331264" class="sd-btn-purple"><i class="fa fa-phone"></i> Call: 8269331264</a>
                         <a href="https://wa.me/918269331264" target="_blank" class="sd-btn-purple" style="background:#25d366"><i class="fa fa-whatsapp"></i> WhatsApp</a>
-                        <a href="mailto:support@swapnildiagnostics.com" class="sd-btn-outline"><i class="fa fa-envelope"></i> Email Us</a>
+                        <a href="mailto:support@pathlabdiagnostics.com" class="sd-btn-outline"><i class="fa fa-envelope"></i> Email Us</a>
                     </div>
                 </div>
 
