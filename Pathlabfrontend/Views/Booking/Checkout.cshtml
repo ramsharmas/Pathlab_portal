@@ -1,0 +1,255 @@
+@{
+    ViewBag.Title = "Checkout";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section styles {
+<style>
+.co-wrap{max-width:860px;margin:40px auto 60px;padding:0 20px;font-family:'Open Sans',sans-serif}
+.co-stepper{display:flex;align-items:center;margin-bottom:40px}
+.co-step{display:flex;align-items:center;flex:1}
+.co-step-dot{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;flex-shrink:0;border:2px solid #ddd;background:#fff;color:#999;transition:all .3s}
+.co-step.active .co-step-dot{background:#632c76;border-color:#632c76;color:#fff}
+.co-step.done .co-step-dot{background:#51ca62;border-color:#51ca62;color:#fff}
+.co-step-label{font-size:13px;font-weight:600;color:#999;margin-left:10px;white-space:nowrap}
+.co-step.active .co-step-label,.co-step.done .co-step-label{color:#222}
+.co-step-line{flex:1;height:2px;background:#ddd;margin:0 10px}
+.co-card{background:#fff;border:1px solid #e8e0f0;border-radius:16px;padding:32px;margin-bottom:24px;box-shadow:0 2px 12px rgba(99,44,118,.06)}
+.co-card h3{font-size:18px;color:#632c76;margin-bottom:20px}
+.co-test-row{display:flex;justify-content:space-between;padding:12px 0;border-bottom:1px solid #f5f0fa}
+.co-test-row:last-child{border-bottom:none}
+.co-test-name{font-size:15px;font-weight:600;color:#222}
+.co-test-meta{font-size:12px;color:#888;margin-top:3px}
+.co-test-price{font-size:16px;font-weight:700;color:#632c76}
+.co-summary-box{background:#f8f5fc;border-radius:12px;padding:18px;margin-top:16px}
+.co-summary-row{display:flex;justify-content:space-between;font-size:14px;color:#555;margin-bottom:8px}
+.co-summary-row.total{font-size:18px;font-weight:bold;color:#632c76;border-top:1px solid #ddd;padding-top:10px;margin-top:4px}
+.co-pay-options{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px;margin-bottom:24px}
+.co-pay-opt{border:2px solid #ddd;border-radius:12px;padding:16px 12px;text-align:center;cursor:pointer;transition:all .2s;background:#fafafa}
+.co-pay-opt:hover,.co-pay-opt.selected{border-color:#632c76;background:#f5f0fa;box-shadow:0 0 0 3px rgba(99,44,118,.15)}
+.co-pay-opt i{font-size:28px;color:#632c76;display:block;margin-bottom:8px}
+.co-pay-opt .opt-label{font-size:13px;font-weight:600;color:#333}
+.co-next-btn{display:block;width:100%;padding:16px;background:#632c76;color:#fff;border:none;border-radius:35px 0 35px 35px;font-size:17px;font-weight:700;cursor:pointer;transition:background .3s;margin-top:8px}
+.co-next-btn:hover{background:#1253be}
+.co-back-link{display:inline-flex;align-items:center;gap:6px;font-size:14px;color:#632c76;cursor:pointer;margin-bottom:20px;background:none;border:none;padding:0;font-family:inherit}
+.co-confirm-top{text-align:center;padding:24px 20px 8px}
+.co-confirm-top i.check-icon{font-size:64px;color:#51ca62;display:block;margin-bottom:12px}
+.co-confirm-top h2{color:#2e7d32;font-size:26px;margin-bottom:8px}
+.co-booking-id-box{background:#f0fff4;border:2px dashed #51ca62;border-radius:12px;padding:16px 24px;text-align:center;margin:20px 0}
+.co-booking-id-box .bid{font-size:28px;font-weight:900;color:#2e7d32;letter-spacing:2px}
+.co-btn-primary{flex:1;min-width:160px;padding:15px 20px;background:#632c76;color:#fff;border:none;border-radius:35px 0 35px 35px;font-size:16px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:8px;transition:background .3s;text-decoration:none}
+.co-btn-primary:hover{background:#1253be}
+.co-btn-outline{flex:1;min-width:160px;padding:14px 20px;background:#fff;color:#632c76;border:2px solid #632c76;border-radius:35px 0 35px 35px;font-size:16px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:8px;text-decoration:none}
+.co-form-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.co-form-field label{display:block;font-size:13px;font-weight:600;color:#555;margin-bottom:6px}
+.co-form-field input,.co-form-field select{width:100%;padding:11px 14px;border:1px solid #ddd;border-radius:8px;font-size:14px;font-family:inherit;box-sizing:border-box}
+.co-form-field input:focus,.co-form-field select:focus{border-color:#632c76;outline:none}
+.co-radio-group{display:flex;gap:20px;margin-bottom:16px}
+.co-radio-opt{display:flex;align-items:center;gap:8px;cursor:pointer;font-size:14px;font-weight:600}
+.co-radio-opt input{accent-color:#632c76}
+.co-spinner{width:56px;height:56px;border:5px solid #f0e8f8;border-top-color:#632c76;border-radius:50%;animation:spin 1s linear infinite;margin:0 auto 20px}
+@@keyframes spin{to{transform:rotate(360deg)}}
+.sd-toast{position:fixed;bottom:24px;right:24px;z-index:99999;background:#632c76;color:#fff;padding:14px 22px;border-radius:10px;font-size:15px;font-weight:500;box-shadow:0 4px 20px rgba(0,0,0,.25);transform:translateY(100px);opacity:0;transition:all .35s ease;pointer-events:none}
+.sd-toast.show{transform:translateY(0);opacity:1}
+.sd-toast.success{background:#2e7d32}
+.sd-toast.error{background:#c62828}
+</style>
+}
+
+<div data-ng-controller="CheckoutController">
+
+<div class="co-wrap">
+
+    <!-- Stepper -->
+    <div class="co-stepper">
+        <div class="co-step" data-ng-class="{active: step==1, done: step>1}" id="dot1">
+            <div class="co-step-dot"><i class="fa fa-check" data-ng-show="step>1"></i><span data-ng-show="step<=1">1</span></div>
+            <span class="co-step-label">Order Review</span>
+        </div>
+        <div class="co-step-line"></div>
+        <div class="co-step" data-ng-class="{active: step==2, done: step>2}" id="dot2">
+            <div class="co-step-dot"><i class="fa fa-check" data-ng-show="step>2"></i><span data-ng-show="step<=2">2</span></div>
+            <span class="co-step-label">Payment</span>
+        </div>
+        <div class="co-step-line"></div>
+        <div class="co-step" data-ng-class="{active: step==3}" id="dot3">
+            <div class="co-step-dot">3</div>
+            <span class="co-step-label">Confirmation</span>
+        </div>
+    </div>
+
+    <!-- Step 1: Order Review + Collection -->
+    <div data-ng-show="step==1">
+        <div class="co-card">
+            <h3><i class="fa fa-shopping-cart"></i> Your Order</h3>
+            <div data-ng-repeat="t in cart" class="co-test-row">
+                <div>
+                    <div class="co-test-name">{{t.TestSuiteName}}</div>
+                    <div class="co-test-meta">{{t.SampleType}} | {{t.TestCount}} parameters</div>
+                </div>
+                <div class="co-test-price">&#8377;{{t.Price}}</div>
+            </div>
+            <div style="margin-top:16px" data-ng-hide="promoResult.Success">
+                <label style="display:block;font-size:13px;font-weight:600;color:#555;margin-bottom:6px">Have a promo code?</label>
+                <div style="display:flex;gap:10px">
+                    <input type="text" placeholder="Enter promo code" data-ng-model="promoCode" style="flex:1;padding:11px 14px;border:1px solid #ddd;border-radius:8px;font-size:14px;text-transform:uppercase">
+                    <button class="co-btn-outline" style="flex:none;padding:11px 18px" data-ng-click="applyPromoCode()">Apply</button>
+                </div>
+            </div>
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-top:12px;padding:10px 14px;background:#e8f5e9;border-radius:8px" data-ng-show="promoResult.Success">
+                <span style="color:#2e7d32;font-size:13px"><i class="fa fa-check-circle"></i> <strong>{{promoResult.Code}}</strong> applied — you saved &#8377;{{promoResult.DiscountAmount}}</span>
+                <button data-ng-click="removePromoCode()" style="background:none;border:none;color:#2e7d32;cursor:pointer;font-size:13px"><i class="fa fa-times"></i></button>
+            </div>
+            <div class="co-summary-box">
+                <div class="co-summary-row"><span>Subtotal</span><span>&#8377;{{subtotal()}}</span></div>
+                <div class="co-summary-row" data-ng-show="discount()>0" style="color:#2e7d32"><span>Discount</span><span>-&#8377;{{discount()}}</span></div>
+                <div class="co-summary-row"><span>GST (18%)</span><span>&#8377;{{gst()}}</span></div>
+                <div class="co-summary-row total"><span>Total Payable</span><span>&#8377;{{total()}}</span></div>
+            </div>
+        </div>
+        <div class="co-card" data-ng-show="familyMembers.length>0">
+            <h3><i class="fa fa-users"></i> Who Is This Booking For?</h3>
+            <div class="co-form-field">
+                <select data-ng-model="bookingForId">
+                    <option value="">Myself ({{patient.FullName}})</option>
+                    <option data-ng-repeat="m in familyMembers" value="{{m.FamilyMemberId}}">{{m.Name}} ({{m.Relation}})</option>
+                </select>
+            </div>
+        </div>
+        <div class="co-card">
+            <h3><i class="fa fa-map-marker"></i> Collection Details</h3>
+            <div class="co-radio-group">
+                <label class="co-radio-opt"><input type="radio" data-ng-model="collectionType" value="walkin"> <span>Walk-in</span></label>
+                <label class="co-radio-opt"><input type="radio" data-ng-model="collectionType" value="home"> <span>Home Collection (+&#8377;100)</span></label>
+            </div>
+            <div class="co-form-grid">
+                <div class="co-form-field" data-ng-show="collectionType=='walkin'">
+                    <label>Select Branch</label>
+                    <select data-ng-model="branchName" data-ng-options="b as b for b in branches">
+                        <option value="">-- Select Branch --</option>
+                    </select>
+                </div>
+                <div class="co-form-field" data-ng-show="collectionType=='home'">
+                    <label>Home Address</label>
+                    <input type="text" data-ng-model="homeAddress" placeholder="Full address">
+                </div>
+                <div class="co-form-field">
+                    <label>Date</label>
+                    <input type="date" data-ng-model="collectionDate" min="{{minDate}}">
+                </div>
+                <div class="co-form-field">
+                    <label>Time Slot</label>
+                    <select data-ng-model="timeSlot" data-ng-options="s as s for s in timeSlots">
+                        <option value="">-- Select Slot --</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        <div class="co-card">
+            <h3><i class="fa fa-user"></i> Patient Details</h3>
+            <div class="co-form-grid">
+                <div class="co-form-field">
+                    <label>Full Name</label>
+                    <input type="text" data-ng-model="patient.FullName" placeholder="Enter your name">
+                </div>
+                <div class="co-form-field">
+                    <label>Phone</label>
+                    <input type="text" data-ng-model="patient.Phone" placeholder="10-digit mobile number">
+                </div>
+                <div class="co-form-field">
+                    <label>Email</label>
+                    <input type="email" data-ng-model="patient.Email" placeholder="Email address">
+                </div>
+                <div class="co-form-field">
+                    <label>Gender</label>
+                    <select data-ng-model="patient.Gender">
+                        <option value="">-- Select --</option>
+                        <option value="Male">Male</option>
+                        <option value="Female">Female</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        <button class="co-next-btn" data-ng-click="goStep2()"><i class="fa fa-arrow-right"></i>&nbsp; Continue to Payment</button>
+    </div>
+
+    <!-- Step 2: Payment -->
+    <div data-ng-show="step==2">
+        <button class="co-back-link" data-ng-click="step=1"><i class="fa fa-arrow-left"></i> Back</button>
+        <div class="co-card">
+            <h3><i class="fa fa-credit-card"></i> Select Payment Method</h3>
+            <div class="co-pay-options">
+                <div class="co-pay-opt" data-ng-class="{selected: payMethod=='upi'}" data-ng-click="payMethod='upi'">
+                    <i class="fa fa-mobile"></i><div class="opt-label">UPI</div>
+                </div>
+                <div class="co-pay-opt" data-ng-class="{selected: payMethod=='card'}" data-ng-click="payMethod='card'">
+                    <i class="fa fa-credit-card-alt"></i><div class="opt-label">Card</div>
+                </div>
+                <div class="co-pay-opt" data-ng-class="{selected: payMethod=='netbank'}" data-ng-click="payMethod='netbank'">
+                    <i class="fa fa-university"></i><div class="opt-label">Net Banking</div>
+                </div>
+                <div class="co-pay-opt" data-ng-class="{selected: payMethod=='counter'}" data-ng-click="payMethod='counter'">
+                    <i class="fa fa-money"></i><div class="opt-label">Pay at Counter</div>
+                </div>
+            </div>
+            <div style="background:#f8f5fc;border-radius:10px;padding:16px;font-size:15px;font-weight:600;color:#632c76">
+                Amount to Pay: <strong>&#8377;{{total()}}</strong>
+            </div>
+        </div>
+        <div data-ng-show="isProcessing" style="text-align:center;padding:30px">
+            <div class="co-spinner"></div>
+            <p style="color:#632c76;font-weight:600">Processing your payment…</p>
+        </div>
+        <button class="co-next-btn" data-ng-hide="isProcessing" data-ng-click="doPayment()">
+            <i class="fa fa-lock"></i>&nbsp; Confirm &amp; Pay
+        </button>
+    </div>
+
+    <!-- Step 3: Confirmation -->
+    <div data-ng-show="step==3">
+        <div class="co-card">
+            <div class="co-confirm-top">
+                <i class="fa fa-check-circle check-icon"></i>
+                <h2>Booking Confirmed!</h2>
+                <p>Thank you for choosing Swapnil Diagnostics. Your booking has been placed.</p>
+            </div>
+            <div class="co-booking-id-box">
+                <div style="font-size:12px;color:#888;font-weight:600;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">Booking Reference</div>
+                <div class="bid">{{confirmedRef}}</div>
+                <div data-ng-show="confirmedSampleId" style="margin-top:8px;font-size:13px;color:#555">
+                    Sample ID: <strong style="letter-spacing:1px;color:#222">{{confirmedSampleId}}</strong>
+                    — quote this when the phlebotomist arrives or at the collection centre.
+                </div>
+            </div>
+            <p style="margin-top:16px;font-size:13px;color:#888">
+                <i class="fa fa-info-circle"></i> A confirmation SMS has been sent to {{patient.Phone}} (once <code>Fast2SmsApiKey</code> is set in WcfPathlabService's Web.config, it delivers for real — otherwise it's logged in Admin &rarr; Notifications Log only)
+            </p>
+            <div style="background:#f8f5fc;border-radius:10px;padding:14px 16px;margin-top:16px" data-ng-show="patient.Phone">
+                <label style="display:flex;align-items:center;gap:10px;font-size:13px;color:#444;cursor:pointer">
+                    <input type="checkbox" data-ng-model="subscribeToRebook">
+                    Remind me to rebook these tests every
+                    <select data-ng-model="rebookFrequencyDays" style="padding:4px 8px;border:1px solid #ddd;border-radius:6px">
+                        <option value="30">30 days</option>
+                        <option value="90">90 days</option>
+                        <option value="180">180 days</option>
+                        <option value="365">365 days</option>
+                    </select>
+                </label>
+                <button data-ng-show="subscribeToRebook" class="co-btn-outline" style="padding:7px 16px;font-size:12px;margin-top:10px" data-ng-click="createRebookReminders()">
+                    <i class="fa fa-bell"></i> Set Reminder
+                </button>
+            </div>
+            <div style="display:flex;gap:14px;margin-top:20px;flex-wrap:wrap">
+                <a href="@Url.Action("Portal","Patient")?tab=bookings" class="co-btn-primary"><i class="fa fa-clipboard"></i>&nbsp; View My Bookings</a>
+                <a data-ng-href="{{waConfirmLink}}" target="_blank" class="co-btn-primary" style="background:#25d366"><i class="fa fa-whatsapp"></i>&nbsp; Get details on WhatsApp</a>
+                <a href="@Url.Action("BookTest","Test")" class="co-btn-outline"><i class="fa fa-flask"></i>&nbsp; Book Another Test</a>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<div class="sd-toast" id="sdToast"></div>
+
+</div><!-- end ng-controller -->

@@ -1,0 +1,424 @@
+@{
+    ViewBag.Title = "Disease / Organ / Habit Wise Tests";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section styles {
+<style>
+.sd-overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:99998;display:none}
+.sd-overlay.active{display:block}
+.sd-toast{position:fixed;bottom:24px;right:24px;z-index:999999;background:#632c76;color:#fff;padding:14px 22px;border-radius:10px;font-size:15px;font-weight:500;box-shadow:0 4px 20px rgba(0,0,0,.25);transform:translateY(100px);opacity:0;transition:all .35s ease;pointer-events:none;max-width:340px}
+.sd-toast.show{transform:translateY(0);opacity:1}
+.sd-toast.success{background:#2e7d32}
+.sd-toast.error{background:#c62828}
+.sd-cart-count-badge{display:inline-flex;align-items:center;justify-content:center;background:#e53e3e;color:#fff;border-radius:50%;width:20px;height:20px;font-size:11px;font-weight:bold;margin-left:4px;vertical-align:top}
+/* Cart Panel */
+.sd-cart-popup{position:fixed;top:0;right:-500px;height:100vh;width:460px;background:#fff;z-index:99999;box-shadow:-6px 0 30px rgba(0,0,0,.2);transition:right .35s ease;overflow-y:auto;display:flex;flex-direction:column}
+.sd-cart-popup.open{right:0}
+.sd-cart-header{background:#632c76;color:#fff;padding:20px 24px;display:flex;align-items:center;justify-content:space-between}
+.sd-cart-header h3{font-size:20px;margin:0;color:#fff}
+.sd-cart-close{background:none;border:none;color:#fff;font-size:24px;cursor:pointer;line-height:1}
+.sd-cart-body{padding:20px 24px;flex:1}
+.sd-cart-empty{text-align:center;padding:60px 20px;color:#999;font-size:16px}
+.sd-cart-empty i{font-size:48px;display:block;margin-bottom:12px;color:#ddd}
+.sd-cart-item{display:flex;align-items:flex-start;justify-content:space-between;padding:14px 0;border-bottom:1px solid #f0f0f0;gap:12px}
+.sd-cart-item-info .item-name{font-size:15px;font-weight:600;color:#222;margin-bottom:4px}
+.sd-cart-item-info .item-meta{font-size:12px;color:#888}
+.sd-cart-item-price{font-size:16px;font-weight:bold;color:#632c76;white-space:nowrap}
+.sd-cart-item-remove{background:none;border:none;color:#e53e3e;cursor:pointer;font-size:18px;padding:0 6px}
+.sd-cart-summary{background:#f8f5fc;border-radius:12px;padding:18px;margin-top:16px}
+.sd-summary-row{display:flex;justify-content:space-between;font-size:14px;color:#555;margin-bottom:8px}
+.sd-summary-row.total{font-size:18px;font-weight:bold;color:#632c76;border-top:1px solid #ddd;padding-top:10px;margin-top:4px}
+.sd-checkout-btn{display:block;width:100%;padding:16px;background:#51ca62;color:#fff;border:none;border-radius:35px 0 35px 35px;font-size:17px;font-weight:700;cursor:pointer;letter-spacing:1px;transition:background .3s;margin-top:16px}
+.sd-checkout-btn:hover{background:#3aaf52}
+.sd-collection-toggle{margin-top:24px}
+.sd-collection-toggle h4{font-size:16px;font-weight:700;color:#333;margin-bottom:14px}
+.sd-toggle-btns{display:flex;border:2px solid #632c76;border-radius:10px;overflow:hidden;margin-bottom:20px}
+.sd-toggle-btn{flex:1;padding:12px;background:#fff;border:none;cursor:pointer;font-size:15px;font-weight:600;color:#632c76;display:flex;align-items:center;justify-content:center;gap:8px;transition:all .2s}
+.sd-toggle-btn.active{background:#632c76;color:#fff}
+.sd-collection-fields{display:none}
+.sd-collection-fields.active{display:block}
+.sd-branch-select select,.sd-address-field input,.sd-address-field select{width:100%;padding:11px 14px;border:1px solid #ddd;border-radius:8px;font-size:14px;margin-bottom:12px;font-family:inherit;color:#333}
+.sd-address-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+/* Disease Category Tabs */
+.sd-category-tabs{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:32px}
+.sd-cat-tab{padding:9px 18px;border:2px solid #632c76;border-radius:30px;font-size:14px;font-weight:600;cursor:pointer;color:#632c76;background:#fff;transition:all .2s;white-space:nowrap}
+.sd-cat-tab.active,.sd-cat-tab:hover{background:#632c76;color:#fff}
+/* Test Grid Cards */
+.sd-test-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:20px;margin-bottom:40px}
+.sd-test-card{background:#fff;border:1px solid #e8e0f0;border-radius:14px;padding:22px;transition:box-shadow .2s;position:relative}
+.sd-test-card:hover{box-shadow:0 6px 24px rgba(99,44,118,.15);border-color:#632c76}
+.sd-test-card .tc-name{font-size:16px;font-weight:700;color:#222;margin-bottom:10px;line-height:1.4}
+.sd-test-card .tc-price{font-size:22px;font-weight:900;color:#632c76;margin-bottom:12px}
+.sd-test-card .tc-meta{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px}
+.sd-tc-chip{font-size:12px;background:#f5f0fa;color:#444;padding:4px 10px;border-radius:6px;display:flex;align-items:center;gap:5px}
+.sd-tc-chip i{color:#632c76;font-size:12px}
+.sd-fasting-badge{font-size:11px;font-weight:700;padding:4px 10px;border-radius:6px;display:inline-flex;align-items:center;gap:5px}
+.sd-fasting-badge.yes{background:#fff3e0;color:#e65100}
+.sd-fasting-badge.no{background:#e8f5e9;color:#2e7d32}
+.sd-tc-actions{display:flex;gap:10px;align-items:center;margin-top:14px}
+.sd-know-more{font-size:13px;color:#632c76;text-decoration:underline;cursor:pointer;background:none;border:none;padding:0}
+.sd-add-btn{display:inline-flex;align-items:center;gap:6px;padding:9px 18px;background:#632c76;color:#fff;border:none;border-radius:20px 0 20px 20px;font-size:13px;font-weight:600;cursor:pointer;transition:background .2s;margin-left:auto}
+.sd-add-btn:hover{background:#1253be}
+/* Detail Modal */
+.sd-detail-modal{position:fixed;inset:0;z-index:99999;display:none;align-items:center;justify-content:center}
+.sd-detail-modal.active{display:flex}
+.sd-detail-modal-box{background:#fff;border-radius:16px;padding:36px;width:540px;max-width:95vw;max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.3);position:relative;animation:fadeInUp .3s}
+@@keyframes fadeInUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+.sd-dm-close{position:absolute;top:14px;right:18px;font-size:22px;cursor:pointer;color:#632c76;font-weight:bold;background:none;border:none}
+.sd-dm-name{font-size:22px;font-weight:bold;color:#222;margin-bottom:6px}
+.sd-dm-price{font-size:28px;font-weight:900;color:#632c76;margin-bottom:18px}
+.sd-dm-meta{display:flex;flex-wrap:wrap;gap:12px;margin-bottom:16px}
+.sd-dm-chip{background:#f5f0fa;border-radius:8px;padding:8px 14px;font-size:14px;color:#444;display:flex;align-items:center;gap:8px}
+.sd-dm-chip i{color:#632c76}
+.sd-dm-fasting{padding:12px 16px;border-radius:10px;margin-bottom:18px;font-size:14px;font-weight:600;display:flex;align-items:center;gap:10px}
+.sd-dm-fasting.req{background:#fff3e0;color:#e65100;border:1px solid #ffcc80}
+.sd-dm-fasting.ok{background:#e8f5e9;color:#2e7d32;border:1px solid #a5d6a7}
+.sd-dm-add-btn{display:block;width:100%;padding:14px;background:#632c76;color:#fff;border:none;border-radius:35px 0 35px 35px;font-size:16px;font-weight:600;cursor:pointer;letter-spacing:1px;transition:background .3s}
+.sd-dm-add-btn:hover{background:#1253be}
+/* Search Box */
+.sd-search-wrap{position:relative;margin-bottom:28px}
+.sd-search-wrap input{width:100%;padding:14px 48px 14px 20px;border:2px solid #632c76;border-radius:12px;font-size:15px;font-family:inherit;color:#222}
+.sd-search-wrap input:focus{outline:none}
+.sd-search-wrap i{position:absolute;right:16px;top:50%;transform:translateY(-50%);color:#632c76;font-size:18px}
+@@media(max-width:600px){.sd-test-grid{grid-template-columns:1fr}.sd-cart-popup{width:100%;right:-100%}.sd-address-grid{grid-template-columns:1fr}}
+</style>
+}
+
+<div class="sd-toast" id="sdToast"></div>
+<div class="sd-overlay" id="sdOverlay"></div>
+
+<!-- ===== TEST DETAIL MODAL ===== -->
+<div class="sd-detail-modal" id="sdDetailModal">
+  <div class="sd-detail-modal-box">
+    <button class="sd-dm-close" onclick="closeModal()">&times;</button>
+    <div class="sd-dm-name" id="dmName"></div>
+    <div class="sd-dm-price" id="dmPrice"></div>
+    <div class="sd-dm-meta">
+      <div class="sd-dm-chip"><i class="fa fa-tint"></i><span>Sample: <strong id="dmSample"></strong></span></div>
+      <div class="sd-dm-chip"><i class="fa fa-list-ol"></i><span>Parameters: <strong id="dmCount"></strong></span></div>
+    </div>
+    <div class="sd-dm-fasting" id="dmFasting">
+      <i class="fa fa-exclamation-triangle"></i><span id="dmFastingText"></span>
+    </div>
+    <button class="sd-dm-add-btn" id="dmAddBtn" onclick="addFromModal()">
+      <i class="fa fa-cart-plus"></i>&nbsp; Add to Cart
+    </button>
+  </div>
+</div>
+
+<!-- ===== CART SLIDE PANEL ===== -->
+<div class="sd-cart-popup" id="sdCartPanel">
+  <div class="sd-cart-header">
+    <h3><i class="fa fa-shopping-cart"></i>&nbsp; Your Cart</h3>
+    <button class="sd-cart-close" onclick="closeCart()">&times;</button>
+  </div>
+  <div class="sd-cart-body">
+    <div class="sd-cart-empty" id="cartEmpty">
+      <i class="fa fa-flask"></i>No tests added yet.
+    </div>
+    <div id="cartItemsList"></div>
+    <div class="sd-cart-summary" id="cartSummary" style="display:none">
+      <div class="sd-summary-row"><span>Subtotal</span><span id="cartSubtotal">&#8377;0</span></div>
+      <div class="sd-summary-row"><span>GST (18%)</span><span id="cartGst">&#8377;0</span></div>
+      <div class="sd-summary-row total"><span>Total Payable</span><span id="cartTotal">&#8377;0</span></div>
+    </div>
+    <div class="sd-collection-toggle" id="collectionToggle" style="display:none">
+      <h4><i class="fa fa-map-marker"></i>&nbsp; Collection Type</h4>
+      <div class="sd-toggle-btns">
+        <button class="sd-toggle-btn active" id="btnWalkin" onclick="setCollection('walkin')"><i class="fa fa-building"></i> Walk-in</button>
+        <button class="sd-toggle-btn" id="btnHome" onclick="setCollection('home')"><i class="fa fa-home"></i> Home Collection</button>
+      </div>
+      <div class="sd-collection-fields active" id="walkinFields">
+        <label style="font-size:13px;font-weight:600;color:#444;margin-bottom:6px;display:block">Select Branch</label>
+        <div class="sd-branch-select">
+          <select id="branchSelector">
+            <option value="">— Choose a Swapnil Diagnostics Centre —</option>
+            <option value="BR001">Bhopal – Main Branch, MP Nagar</option>
+            <option value="BR002">Bhopal – Kolar Road Centre</option>
+            <option value="BR003">Bhopal – Arera Colony</option>
+            <option value="BR004">Indore – Vijay Nagar</option>
+            <option value="BR005">Indore – Palasia Square</option>
+          </select>
+        </div>
+      </div>
+      <div class="sd-collection-fields" id="homeFields">
+        <label style="font-size:13px;font-weight:600;color:#444;margin-bottom:6px;display:block">Delivery Address</label>
+        <div class="sd-address-field">
+          <input type="text" id="addrStreet" placeholder="House No. / Street / Area">
+          <div class="sd-address-grid">
+            <input type="text" id="addrCity" placeholder="City">
+            <input type="text" id="addrState" placeholder="State">
+            <input type="text" id="addrPin" placeholder="PIN Code" maxlength="6" oninput="this.value=this.value.replace(/\D/g,'')">
+            <select id="addrType"><option>Home</option><option>Office</option><option>Other</option></select>
+          </div>
+        </div>
+      </div>
+      <button class="sd-checkout-btn" onclick="proceedCheckout()"><i class="fa fa-lock"></i>&nbsp; Proceed to Checkout</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== BANNER ===== -->
+<div class="banner-outer">
+  <div class="banner-box">
+    <img src="@Url.Content("~/images/disease-banner.png")" alt="Disease / Organ / Habit Wise Tests – Swapnil Diagnostics">
+  </div>
+</div>
+
+<!-- ===== MAIN CONTENT ===== -->
+<div class="inner-page-section why-section">
+  <div class="wrapper clearfix">
+    <div class="path-box">
+      <p><a href="@Url.Action("Index","Home")">Home</a> &gt; <span>Disease/Organ/Habit Wise Tests</span></p>
+      <h3>Find the Right Test for Your Health Condition</h3>
+      <p style="text-transform:none;color:#000">Select a disease, organ system, or habit category to discover relevant tests from our LIMS catalogue. Click any test card to view full details and add to your cart.</p>
+    </div>
+
+    <!-- Cart Button -->
+    <div style="display:flex;justify-content:flex-end;margin-bottom:20px">
+      <button style="display:inline-flex;align-items:center;gap:10px;padding:12px 24px;background:#1253be;color:#fff;border:none;border-radius:35px 0 35px 35px;font-size:15px;font-weight:600;cursor:pointer" onclick="openCart(event)">
+        <i class="fa fa-shopping-cart"></i> View Cart
+        <span class="sd-cart-count-badge" id="catalogueCartBadge" style="display:none">0</span>
+      </button>
+    </div>
+
+    <!-- LIMS Test Selector Dropdown -->
+    <div style="background:linear-gradient(135deg,#f8f0ff,#f0f8ff);border-radius:16px;padding:28px 32px;margin-bottom:32px;box-shadow:0 4px 20px rgba(99,44,118,.08)">
+      <label style="display:block;font-size:13px;font-weight:700;color:#632c76;margin-bottom:10px;text-transform:uppercase;letter-spacing:1px"><i class="fa fa-list-alt"></i>&nbsp; Select Specific Test from LIMS Catalogue</label>
+      <div style="position:relative">
+        <select id="limsTestDropdown" onchange="onDropdownSelect(this.value)" style="width:100%;padding:16px 20px;font-size:16px;border:2px solid #632c76;border-radius:12px;color:#222;background:#fff;appearance:none;cursor:pointer;font-family:inherit">
+          <option value="">— Choose a Test Suite (TestSuiteName – ₹Price) —</option>
+        </select>
+        <span style="position:absolute;right:18px;top:50%;transform:translateY(-50%);color:#632c76;pointer-events:none;font-family:FontAwesome">&#xf078;</span>
+      </div>
+    </div>
+
+    <!-- Search Box -->
+    <div class="sd-search-wrap">
+      <input type="text" id="testSearch" placeholder="Filter tests by name..." oninput="filterTests(this.value)">
+      <i class="fa fa-search"></i>
+    </div>
+
+    <!-- Category Tabs -->
+    <div class="sd-category-tabs" id="categoryTabs"></div>
+
+    <!-- Test Grid -->
+    <div class="sd-test-grid" id="testGrid"></div>
+
+    <div id="noResults" style="display:none;text-align:center;padding:40px;color:#999;font-size:16px">
+      <i class="fa fa-search" style="font-size:40px;display:block;margin-bottom:12px;color:#ddd"></i>
+      No tests found matching your criteria.
+    </div>
+  </div>
+</div>
+
+@section scripts {
+<script type="text/javascript" src="@Url.Content("~/Scripts/slick.js")"></script>
+<script>
+// ── LIMS TEST MASTER (SetupTestsuite) with disease/organ/habit category tags ─
+const LIMS_TESTS = [
+  {TestSuiteID:'TST001',TestSuiteName:'Complete Blood Count (CBC)',           Price:350,  SampleType:'Blood',        TestCount:24,FastingRequired:false,Categories:['All','Anaemia','Fever','Habit']},
+  {TestSuiteID:'TST002',TestSuiteName:'Lipid Profile',                         Price:650,  SampleType:'Blood',        TestCount:8, FastingRequired:true, Categories:['All','Heart','Obesity']},
+  {TestSuiteID:'TST003',TestSuiteName:'Liver Function Test (LFT)',              Price:750,  SampleType:'Blood',        TestCount:12,FastingRequired:true, Categories:['All','Liver','Habit']},
+  {TestSuiteID:'TST004',TestSuiteName:'Kidney Function Test (KFT)',             Price:700,  SampleType:'Blood',        TestCount:10,FastingRequired:false,Categories:['All','Kidney']},
+  {TestSuiteID:'TST005',TestSuiteName:'Thyroid Profile (T3, T4, TSH)',          Price:550,  SampleType:'Blood',        TestCount:3, FastingRequired:false,Categories:['All','Thyroid']},
+  {TestSuiteID:'TST006',TestSuiteName:'HbA1c (Glycated Haemoglobin)',           Price:450,  SampleType:'Blood',        TestCount:1, FastingRequired:false,Categories:['All','Diabetes']},
+  {TestSuiteID:'TST007',TestSuiteName:'Urine Routine & Microscopy',            Price:200,  SampleType:'Urine',        TestCount:18,FastingRequired:false,Categories:['All','Kidney','Diabetes']},
+  {TestSuiteID:'TST008',TestSuiteName:'Dengue NS1 Antigen',                    Price:600,  SampleType:'Blood',        TestCount:1, FastingRequired:false,Categories:['All','Fever']},
+  {TestSuiteID:'TST009',TestSuiteName:'Vitamin D (25-OH)',                      Price:1200, SampleType:'Blood',        TestCount:1, FastingRequired:false,Categories:['All','Bone','Deficiency']},
+  {TestSuiteID:'TST010',TestSuiteName:'Vitamin B12',                           Price:850,  SampleType:'Blood',        TestCount:1, FastingRequired:false,Categories:['All','Anaemia','Deficiency','Habit']},
+  {TestSuiteID:'TST011',TestSuiteName:'Iron Studies (Serum Iron, TIBC, Ferritin)',Price:900,SampleType:'Blood',       TestCount:3, FastingRequired:false,Categories:['All','Anaemia']},
+  {TestSuiteID:'TST012',TestSuiteName:'Blood Glucose Fasting (FBS)',            Price:150,  SampleType:'Blood',        TestCount:1, FastingRequired:true, Categories:['All','Diabetes']},
+  {TestSuiteID:'TST013',TestSuiteName:'C-Reactive Protein (CRP)',              Price:350,  SampleType:'Blood',        TestCount:1, FastingRequired:false,Categories:['All','Arthritis','Fever']},
+  {TestSuiteID:'TST014',TestSuiteName:'Allergy Screen Panel (20 Allergens)',    Price:2500, SampleType:'Blood',        TestCount:20,FastingRequired:false,Categories:['All','Allergy','Habit']},
+  {TestSuiteID:'TST015',TestSuiteName:'Comprehensive Health Package',           Price:3500, SampleType:'Blood, Urine', TestCount:65,FastingRequired:true, Categories:['All','Packages']},
+  {TestSuiteID:'TST016',TestSuiteName:'Blood Glucose Post Prandial (PPBS)',     Price:150,  SampleType:'Blood',        TestCount:1, FastingRequired:false,Categories:['All','Diabetes']},
+  {TestSuiteID:'TST017',TestSuiteName:'Serum Calcium',                         Price:280,  SampleType:'Blood',        TestCount:1, FastingRequired:false,Categories:['All','Bone']},
+  {TestSuiteID:'TST018',TestSuiteName:'PSA (Prostate Specific Antigen)',        Price:800,  SampleType:'Blood',        TestCount:1, FastingRequired:false,Categories:['All','Cancer']},
+  {TestSuiteID:'TST019',TestSuiteName:'Dengue IgG & IgM Antibody',             Price:900,  SampleType:'Blood',        TestCount:2, FastingRequired:false,Categories:['All','Fever']},
+  {TestSuiteID:'TST020',TestSuiteName:'COVID-19 RT-PCR',                       Price:500,  SampleType:'Nasal Swab',   TestCount:1, FastingRequired:false,Categories:['All','Fever','Packages']},
+];
+
+const CATEGORIES = ['All','Diabetes','Heart','Liver','Kidney','Thyroid','Anaemia','Fever','Bone','Allergy','Arthritis','Cancer','Deficiency','Obesity','Habit','Packages'];
+
+let cart = JSON.parse(sessionStorage.getItem('sd_cart')||'[]');
+let currentUser = JSON.parse(localStorage.getItem('sd_user')||'null');
+let activeCategory = 'All';
+let activeSearch = '';
+let modalTestID = null;
+let currentCollection = 'walkin';
+
+// ── INIT ─────────────────────────────────────────────────────────────────────
+(function init(){
+  // Populate dropdown
+  const sel = document.getElementById('limsTestDropdown');
+  LIMS_TESTS.forEach(t => {
+    const opt = document.createElement('option');
+    opt.value = t.TestSuiteID;
+    opt.textContent = t.TestSuiteName + ' – ₹' + t.Price.toLocaleString('en-IN');
+    sel.appendChild(opt);
+  });
+  // Build category tabs
+  const tabsEl = document.getElementById('categoryTabs');
+  CATEGORIES.forEach(cat => {
+    const btn = document.createElement('button');
+    btn.className = 'sd-cat-tab' + (cat==='All'?' active':'');
+    btn.textContent = cat;
+    btn.onclick = () => selectCategory(cat);
+    tabsEl.appendChild(btn);
+  });
+  renderGrid();
+  updateCartBadge();
+})();
+
+function selectCategory(cat){
+  activeCategory = cat;
+  document.querySelectorAll('.sd-cat-tab').forEach(b => b.classList.toggle('active', b.textContent===cat));
+  renderGrid();
+}
+
+function filterTests(val){ activeSearch = val.toLowerCase(); renderGrid(); }
+
+function onDropdownSelect(id){
+  if(!id) return;
+  const t = LIMS_TESTS.find(x=>x.TestSuiteID===id);
+  if(t) openModal(t.TestSuiteID);
+}
+
+function renderGrid(){
+  const grid = document.getElementById('testGrid');
+  const noRes = document.getElementById('noResults');
+  let filtered = LIMS_TESTS.filter(t => {
+    const catMatch = activeCategory==='All' || t.Categories.includes(activeCategory);
+    const srchMatch = !activeSearch || t.TestSuiteName.toLowerCase().includes(activeSearch) || t.SampleType.toLowerCase().includes(activeSearch);
+    return catMatch && srchMatch;
+  });
+  if(filtered.length===0){ grid.innerHTML=''; noRes.style.display='block'; return; }
+  noRes.style.display='none';
+  grid.innerHTML = filtered.map(t => `
+    <div class="sd-test-card">
+      <div class="tc-name">${t.TestSuiteName}</div>
+      <div class="tc-price">&#8377;${t.Price.toLocaleString('en-IN')}</div>
+      <div class="tc-meta">
+        <span class="sd-tc-chip"><i class="fa fa-tint"></i>${t.SampleType}</span>
+        <span class="sd-tc-chip"><i class="fa fa-list-ol"></i>${t.TestCount} Parameter${t.TestCount!==1?'s':''}</span>
+        <span class="sd-fasting-badge ${t.FastingRequired?'yes':'no'}">
+          <i class="fa fa-${t.FastingRequired?'exclamation-triangle':'check-circle'}"></i>
+          ${t.FastingRequired?'Fasting Required':'No Fasting'}
+        </span>
+      </div>
+      <div class="sd-tc-actions">
+        <button class="sd-know-more" onclick="openModal('${t.TestSuiteID}')"><i class="fa fa-info-circle"></i> Know More</button>
+        <button class="sd-add-btn" onclick="addToCart('${t.TestSuiteID}')"><i class="fa fa-cart-plus"></i> Add to Cart</button>
+      </div>
+    </div>`).join('');
+}
+
+// ── MODAL ─────────────────────────────────────────────────────────────────────
+function openModal(id){
+  const t = LIMS_TESTS.find(x=>x.TestSuiteID===id);
+  if(!t) return;
+  modalTestID = id;
+  document.getElementById('dmName').textContent = t.TestSuiteName;
+  document.getElementById('dmPrice').textContent = '₹'+t.Price.toLocaleString('en-IN');
+  document.getElementById('dmSample').textContent = t.SampleType;
+  document.getElementById('dmCount').textContent = t.TestCount+' Parameter'+(t.TestCount!==1?'s':'');
+  const f = document.getElementById('dmFasting');
+  document.getElementById('dmFastingText').textContent = t.FastingRequired
+    ? 'Fasting Required: Please fast 8–10 hours before sample collection.'
+    : 'No Fasting Required: You may eat and drink normally.';
+  f.className = 'sd-dm-fasting '+(t.FastingRequired?'req':'ok');
+  document.getElementById('sdDetailModal').classList.add('active');
+  document.getElementById('sdOverlay').classList.add('active');
+}
+
+function closeModal(){
+  document.getElementById('sdDetailModal').classList.remove('active');
+  document.getElementById('sdOverlay').classList.remove('active');
+}
+
+function addFromModal(){
+  if(modalTestID){ addToCart(modalTestID); closeModal(); }
+}
+
+// ── CART ─────────────────────────────────────────────────────────────────────
+function addToCart(id){
+  if(cart.find(i=>i.TestSuiteID===id)){ showToast('Already in cart.','error'); return; }
+  const t=LIMS_TESTS.find(x=>x.TestSuiteID===id);
+  if(!t) return;
+  cart.push({...t});
+  sessionStorage.setItem('sd_cart',JSON.stringify(cart));
+  updateCartBadge(); renderCartItems();
+  showToast('"'+t.TestSuiteName+'" added to cart!','success');
+}
+
+function openCart(e){ if(e) e.preventDefault(); renderCartItems(); document.getElementById('sdCartPanel').classList.add('open'); document.getElementById('sdOverlay').classList.add('active'); }
+function closeCart(){ document.getElementById('sdCartPanel').classList.remove('open'); if(!document.getElementById('sdDetailModal').classList.contains('active')) document.getElementById('sdOverlay').classList.remove('active'); }
+
+function removeFromCart(id){
+  cart=cart.filter(i=>i.TestSuiteID!==id);
+  sessionStorage.setItem('sd_cart',JSON.stringify(cart));
+  updateCartBadge(); renderCartItems();
+}
+
+function renderCartItems(){
+  const list=document.getElementById('cartItemsList');
+  const empty=document.getElementById('cartEmpty');
+  const summary=document.getElementById('cartSummary');
+  const toggle=document.getElementById('collectionToggle');
+  if(cart.length===0){ list.innerHTML=''; empty.style.display='block'; summary.style.display='none'; toggle.style.display='none'; return; }
+  empty.style.display='none'; summary.style.display='block'; toggle.style.display='block';
+  list.innerHTML=cart.map(item=>`
+    <div class="sd-cart-item">
+      <div class="sd-cart-item-info">
+        <div class="item-name">${item.TestSuiteName}</div>
+        <div class="item-meta">${item.SampleType} | ${item.TestCount} Param${item.TestCount!==1?'s':''}</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px">
+        <span class="sd-cart-item-price">&#8377;${item.Price.toLocaleString('en-IN')}</span>
+        <button class="sd-cart-item-remove" onclick="removeFromCart('${item.TestSuiteID}')"><i class="fa fa-trash"></i></button>
+      </div>
+    </div>`).join('');
+  const sub=cart.reduce((s,i)=>s+i.Price,0);
+  const gst=Math.round(sub*0.18);
+  document.getElementById('cartSubtotal').textContent='&#8377;'+sub.toLocaleString('en-IN');
+  document.getElementById('cartGst').textContent='&#8377;'+gst.toLocaleString('en-IN');
+  document.getElementById('cartTotal').textContent='&#8377;'+(sub+gst).toLocaleString('en-IN');
+}
+
+function updateCartBadge(){
+  const c=cart.length;
+  ['headerCartBadge','catalogueCartBadge'].forEach(id=>{ const el=document.getElementById(id); if(el){ el.textContent=c; el.style.display=c>0?'inline-flex':'none'; } });
+}
+
+function setCollection(type){
+  currentCollection=type;
+  document.getElementById('btnWalkin').classList.toggle('active',type==='walkin');
+  document.getElementById('btnHome').classList.toggle('active',type==='home');
+  document.getElementById('walkinFields').classList.toggle('active',type==='walkin');
+  document.getElementById('homeFields').classList.toggle('active',type==='home');
+}
+
+function proceedCheckout(){
+  if(cart.length===0){ showToast('Cart is empty.','error'); return; }
+  // Cart page handles the rest of the flow (login → collection → review)
+  window.location.href='@Url.Action("Cart","Booking")';
+}
+
+function logoutUser(e){
+  e.preventDefault();
+  localStorage.removeItem('sd_user'); sessionStorage.removeItem('pathlabUser'); sessionStorage.removeItem('sd_cart');
+  currentUser=null; cart=[]; updateCartBadge();
+  showToast('You have been logged out.','success');
+}
+
+function showToast(msg,type=''){
+  const t=document.getElementById('sdToast');
+  t.textContent=msg; t.className='sd-toast '+(type||'')+' show';
+  setTimeout(()=>t.classList.remove('show'),3500);
+}
+
+document.getElementById('sdOverlay').addEventListener('click',()=>{ closeCart(); closeModal(); });
+</script>
+}

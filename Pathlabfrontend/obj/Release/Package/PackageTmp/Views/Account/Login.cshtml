@@ -1,0 +1,367 @@
+@{
+    ViewBag.Title = "Login";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section styles {
+<style>
+.login-wrap{max-width:520px;margin:48px auto 64px;padding:0 20px}
+.login-breadcrumb{margin-bottom:24px;font-size:13px;color:#888}
+.login-breadcrumb a{color:#632c76;text-decoration:none}
+.login-breadcrumb a:hover{text-decoration:underline}
+.login-card{background:#fff;border:1px solid #e8e0f0;border-radius:20px;padding:40px 40px;box-shadow:0 4px 24px rgba(99,44,118,.10)}
+.login-logo-row{text-align:center;margin-bottom:28px}
+.login-logo-row .icon-circle{width:64px;height:64px;background:linear-gradient(135deg,#632c76,#1253be);border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:28px;color:#fff;margin-bottom:12px}
+.login-logo-row h2{font-size:22px;font-weight:700;color:#632c76;margin-bottom:4px}
+.login-logo-row p{font-size:14px;color:#888;margin:0}
+.login-step{display:none}
+.login-step.active{display:block}
+.lf-row{margin-bottom:18px}
+.lf-row label{display:block;font-size:13px;font-weight:700;color:#444;margin-bottom:6px;text-transform:uppercase;letter-spacing:.4px}
+.lf-row input,.lf-row select{width:100%;padding:13px 16px;border:1.5px solid #ddd;border-radius:10px;font-size:15px;color:#222;font-family:inherit;background:#fafafa;transition:border-color .2s;box-sizing:border-box}
+.lf-row input:focus,.lf-row select:focus{border-color:#632c76;outline:none;background:#fff}
+.lf-row.two-col{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.lf-row.two-col .lf-row{margin-bottom:0}
+.lf-terms{display:flex;align-items:flex-start;gap:10px;margin-bottom:20px}
+.lf-terms input[type=checkbox]{margin-top:3px;accent-color:#632c76;width:16px;height:16px;flex-shrink:0}
+.lf-terms label{font-size:13px;color:#666;line-height:1.5}
+.lf-terms a{color:#632c76;text-decoration:underline}
+.lf-otp-grid{display:flex;gap:10px;justify-content:center;margin:20px 0}
+.lf-otp-grid input{width:50px;height:56px;text-align:center;font-size:24px;font-weight:700;border:2px solid #ddd;border-radius:10px;font-family:inherit;transition:border-color .2s}
+.lf-otp-grid input:focus{border-color:#632c76;outline:none}
+.lf-primary-btn{display:block;width:100%;padding:15px;background:#632c76;color:#fff;border:none;border-radius:35px 0 35px 35px;font-size:16px;font-weight:700;cursor:pointer;letter-spacing:1px;transition:background .3s;margin-top:4px}
+.lf-primary-btn:hover{background:#1253be}
+.lf-back-btn{background:none;border:none;color:#632c76;font-size:14px;cursor:pointer;padding:0;font-family:inherit;text-decoration:underline;margin-top:12px;display:block;text-align:center}
+.lf-resend-row{text-align:center;margin-top:12px;font-size:13px;color:#888;line-height:1.6}
+.lf-resend-btn{background:none;border:none;font-size:13px;font-weight:600;padding:0;cursor:pointer;transition:color .2s}
+.lf-resend-btn:disabled{color:#bbb;cursor:not-allowed}
+.lf-resend-btn.active{color:#632c76}
+.lf-success-box{text-align:center;padding:16px 0}
+.lf-success-box i{font-size:56px;color:#51ca62;display:block;margin-bottom:12px}
+.lf-success-box h3{color:#2e7d32;margin-bottom:8px}
+.lf-success-box p{color:#555;font-size:14px;margin-bottom:20px}
+.lf-field-err{font-size:12px;color:#c62828;display:block;margin-top:4px;font-weight:500}
+.lf-secure-note{display:flex;align-items:center;gap:8px;font-size:12px;color:#888;margin-top:20px;justify-content:center}
+.lf-secure-note i{color:#51ca62}
+.sd-toast{position:fixed;bottom:24px;right:24px;z-index:999999;background:#632c76;color:#fff;padding:14px 22px;border-radius:10px;font-size:15px;font-weight:500;box-shadow:0 4px 20px rgba(0,0,0,.25);transform:translateY(100px);opacity:0;transition:all .35s ease;pointer-events:none;max-width:340px}
+.sd-toast.show{transform:translateY(0);opacity:1}
+.sd-toast.success{background:#2e7d32}
+.sd-toast.error{background:#c62828}
+@@media(max-width:600px){.login-card{padding:28px 20px}.lf-otp-grid input{width:40px;height:48px;font-size:20px}.lf-row.two-col{grid-template-columns:1fr}}
+</style>
+}
+
+<div class="sd-toast" id="sdToast"></div>
+
+<!-- ===== BANNER ===== -->
+<div class="banner-outer">
+  <div class="banner-box">
+    <img src="@Url.Content("~/images/pathology-test-banner.png")" alt="Login – Swapnil Diagnostics">
+  </div>
+</div>
+
+<!-- ===== MAIN CONTENT ===== -->
+<div class="inner-page-section why-section">
+  <div class="wrapper clearfix">
+    <div class="login-wrap">
+      <div class="login-breadcrumb">
+        <a href="@Url.Action("Index","Home")">Home</a> &gt; <a href="@Url.Action("BookTest","Test")">Book a Test</a> &gt; <a href="@Url.Action("Cart","Booking")">Cart</a> &gt; <span>Login</span>
+      </div>
+
+      <div class="login-card">
+        <div class="login-logo-row">
+          <div class="icon-circle"><i class="fa fa-user"></i></div>
+          <h2>Login or Sign Up</h2>
+          <p>Enter your mobile number — no password needed</p>
+        </div>
+
+        <!-- Step 1: Mobile number -->
+        <div class="login-step active" id="lstep1">
+          <div class="lf-row">
+            <label><i class="fa fa-mobile"></i>&nbsp; Mobile Number</label>
+            <input type="tel" id="lfMobile" maxlength="10" placeholder="10-digit mobile number" oninput="this.value=this.value.replace(/\D/g,'')">
+          </div>
+          <div class="lf-terms">
+            <input type="checkbox" id="lfTerms">
+            <label for="lfTerms">I agree to the <a href="@Url.Action("Terms","Info")">Terms of Use</a> &amp; <a href="@Url.Action("Privacy","Info")">Privacy Policy</a> of Swapnil Diagnostics</label>
+          </div>
+          <button class="lf-primary-btn" onclick="sendOTP()">
+            <i class="fa fa-paper-plane"></i>&nbsp; Get OTP
+          </button>
+          <div class="lf-secure-note">
+            <i class="fa fa-lock"></i> Secure login. No password required.
+          </div>
+        </div>
+
+        <!-- Step 2: OTP -->
+        <div class="login-step" id="lstep2">
+          <p style="font-size:14px;color:#555;text-align:center;margin-bottom:8px">Enter the 6-digit OTP sent to</p>
+          <p id="lfOtpSentTo" style="font-size:16px;font-weight:700;color:#632c76;text-align:center;margin-bottom:4px"></p>
+          <div class="lf-otp-grid">
+            <input type="tel" maxlength="1" id="lfOtp0" oninput="otpNav(this,0)">
+            <input type="tel" maxlength="1" id="lfOtp1" oninput="otpNav(this,1)">
+            <input type="tel" maxlength="1" id="lfOtp2" oninput="otpNav(this,2)">
+            <input type="tel" maxlength="1" id="lfOtp3" oninput="otpNav(this,3)">
+            <input type="tel" maxlength="1" id="lfOtp4" oninput="otpNav(this,4)">
+            <input type="tel" maxlength="1" id="lfOtp5" oninput="otpNav(this,5)">
+          </div>
+          <button class="lf-primary-btn" onclick="verifyOTP()">
+            <i class="fa fa-check"></i>&nbsp; Verify &amp; Continue
+          </button>
+          <div class="lf-resend-row">
+            Didn't receive it?&nbsp;
+            <button id="lfResendBtn" class="lf-resend-btn" onclick="resendOTP()" disabled>
+              Resend OTP (<span id="lfResendTimer">30</span>s)
+            </button>
+          </div>
+          <button class="lf-back-btn" onclick="goStep(1)">&#8592; Change Number</button>
+        </div>
+
+        <!-- Step 3: New patient registration -->
+        <div class="login-step" id="lstep3">
+          <p style="font-size:14px;color:#555;margin-bottom:20px">You're new here — please fill in your details to create your account.</p>
+          <div class="lf-row">
+            <label>Title</label>
+            <select id="lfTitle">
+              <option value="">— Select Title —</option>
+              <option value="Mr.">Mr.</option>
+              <option value="Mrs.">Mrs.</option>
+              <option value="Miss">Miss</option>
+              <option value="Master">Master</option>
+              <option value="Dr.">Dr.</option>
+            </select>
+          </div>
+          <div class="lf-row two-col">
+            <div class="lf-row">
+              <label>First Name</label>
+              <input type="text" id="lfFirstName" placeholder="First Name" oninput="titleCase(this)">
+            </div>
+            <div class="lf-row">
+              <label>Last Name</label>
+              <input type="text" id="lfLastName" placeholder="Last Name" oninput="titleCase(this)">
+            </div>
+          </div>
+          <div class="lf-row two-col">
+            <div class="lf-row">
+              <label>Date of Birth</label>
+              <input type="date" id="lfDOB">
+            </div>
+            <div class="lf-row">
+              <label>Gender</label>
+              <select id="lfGender">
+                <option value="">— Select —</option>
+                <option value="Male">Male</option>
+                <option value="Female">Female</option>
+                <option value="Other">Other</option>
+                <option value="Prefer not to say">Prefer not to say</option>
+              </select>
+            </div>
+          </div>
+          <div class="lf-row">
+            <label>Email Address <span style="color:#aaa;font-weight:400">(optional)</span></label>
+            <input type="email" id="lfEmail" placeholder="email@example.com">
+          </div>
+          <div class="lf-row">
+            <label>Address</label>
+            <input type="text" id="lfAddress" placeholder="House / Street / Locality">
+          </div>
+          <div class="lf-row two-col">
+            <div class="lf-row">
+              <label>City</label>
+              <input type="text" id="lfCity" placeholder="City" oninput="titleCase(this)">
+            </div>
+            <div class="lf-row">
+              <label>Pincode</label>
+              <input type="tel" id="lfPincode" maxlength="6" placeholder="Pincode">
+            </div>
+          </div>
+          <button class="lf-primary-btn" onclick="completeRegistration()">
+            <i class="fa fa-check-circle"></i>&nbsp; Create Account &amp; Continue
+          </button>
+        </div>
+
+        <!-- Step 4: Success -->
+        <div class="login-step" id="lstep4">
+          <div class="lf-success-box">
+            <i class="fa fa-check-circle"></i>
+            <h3 id="lfWelcomeMsg">Welcome!</h3>
+            <p>You are now logged in. Taking you to the next step…</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+@section scripts {
+<script src="@Url.Content("~/Scripts/config.js")"></script>
+<script src="@Url.Content("~/Scripts/lims-api.js")"></script>
+<script>
+// Read redirect destination from ?next= param (defaults to Choose Collection)
+const params = new URLSearchParams(window.location.search);
+const nextPage = params.get('next') || '@Url.Action("ChooseCollection","Booking")';
+
+// If already logged in, skip straight to destination
+(function(){
+  const u = JSON.parse(localStorage.getItem('sd_user')||'null');
+  if(u){ mirrorPortalUser(u); window.location.href = nextPage; }
+  document.getElementById('lfDOB').max = new Date().toISOString().split('T')[0];
+})();
+
+function showToast(msg, type){
+  const t=document.getElementById('sdToast');
+  t.textContent=msg; t.className='sd-toast '+(type||'');
+  setTimeout(()=>t.classList.add('show'),10);
+  setTimeout(()=>t.classList.remove('show'),3200);
+}
+
+// The patient portal and checkout read sessionStorage "pathlabUser" — mirror
+// every login there so the patient is recognised without logging in twice.
+function mirrorPortalUser(u){
+  sessionStorage.setItem('pathlabUser', JSON.stringify({
+    Success:true, PatientId:u.WcfPatientId||0,
+    FullName:((u.Title||'')+' '+(u.FirstName||'')+' '+(u.LastName||'')).replace(/\s+/g,' ').trim(),
+    Phone:u.MobileNumber||'', Email:u.Email||'', Gender:u.Gender||'',
+    DateOfBirth:u.DOB||'', Address:u.Address||'', City:u.City||'', Pincode:u.Pincode||''
+  }));
+}
+
+function goStep(n){
+  document.querySelectorAll('.login-step').forEach((s,i)=>s.classList.toggle('active',i===n-1));
+}
+
+function titleCase(el){
+  if(el.value.length>0) el.value=el.value.charAt(0).toUpperCase()+el.value.slice(1);
+}
+
+// ── OTP countdown ──────────────────────────────────────────────────────────
+let _resendInterval=null;
+function startResendTimer(){
+  const btn=document.getElementById('lfResendBtn');
+  const sp=document.getElementById('lfResendTimer');
+  let t=30; btn.disabled=true; sp.textContent=t;
+  clearInterval(_resendInterval);
+  _resendInterval=setInterval(()=>{
+    t--; sp.textContent=t;
+    if(t<=0){ clearInterval(_resendInterval); btn.disabled=false; btn.classList.add('active'); btn.textContent='Resend OTP'; }
+  },1000);
+}
+
+function otpNav(el,idx){
+  el.value=el.value.replace(/\D/g,'');
+  if(el.value.length===1 && idx<5) document.getElementById('lfOtp'+(idx+1)).focus();
+}
+
+// ── Step 1: Send OTP ───────────────────────────────────────────────────────
+async function sendOTP(){
+  const m = document.getElementById('lfMobile').value.trim();
+  if(!/^\d{10}$/.test(m)){ showToast('Enter a valid 10-digit mobile number.','error'); return; }
+  if(!document.getElementById('lfTerms').checked){ showToast('Please agree to the Terms & Privacy Policy.','error'); return; }
+  let demoMode=false;
+  try { await LIMS.sendOtp(m); } catch(e){ demoMode=true; console.info('[LIMS] WCF OTP unreachable — demo mode'); }
+  document.getElementById('lfOtpSentTo').textContent = '+91 '+m;
+  for(let i=0;i<6;i++) document.getElementById('lfOtp'+i).value='';
+  goStep(2);
+  showToast('OTP sent to +91 '+m,'success');
+  startResendTimer();
+  setTimeout(()=>document.getElementById('lfOtp0').focus(), 100);
+}
+
+async function resendOTP(){
+  const m=document.getElementById('lfMobile').value.trim();
+  try { await LIMS.sendOtp(m); } catch(e){}
+  showToast('OTP resent to +91 '+m+'.','success');
+  startResendTimer();
+}
+
+// ── Step 2: Verify OTP ─────────────────────────────────────────────────────
+async function verifyOTP(){
+  const d=[0,1,2,3,4,5].map(i=>document.getElementById('lfOtp'+i).value).join('');
+  if(d.length<6){ showToast('Enter the 6-digit OTP.','error'); return; }
+  const mobile=document.getElementById('lfMobile').value.trim();
+  let wcfPatientId=0, wcfOk=false;
+  try {
+    const res=await LIMS.verifyOtp(mobile,d);
+    if(!res.Success){ showToast('Invalid OTP. Please try again.','error'); return; }
+    wcfOk=true; wcfPatientId=res.PatientId||0;
+  } catch(e){
+    showToast('Could not verify OTP. Please try again.','error'); return;
+  }
+  clearInterval(_resendInterval);
+  if(wcfOk && wcfPatientId>0){
+    try {
+      const pat=await LIMS.getPatient(wcfPatientId);
+      const parts=(pat.FullName||'').trim().split(' ');
+      const u={PatientID:'PAT'+wcfPatientId,WcfPatientId:wcfPatientId,MobileNumber:pat.Phone||mobile,Title:'',FirstName:parts[0]||'',LastName:parts.slice(1).join(' ')||'',Email:pat.Email||'',Gender:pat.Gender||'',DOB:pat.DateOfBirth||'',Address:pat.Address||'',City:pat.City||'',Pincode:pat.Pincode||'',registeredAt:pat.CreatedDate||new Date().toISOString()};
+      localStorage.setItem('sd_user',JSON.stringify(u));
+      mirrorPortalUser(u);
+      document.getElementById('lfWelcomeMsg').textContent='Welcome back, '+u.FirstName+'!';
+    } catch(e2){
+      const ex2=JSON.parse(localStorage.getItem('sd_user')||'null');
+      if(ex2){ mirrorPortalUser(ex2); document.getElementById('lfWelcomeMsg').textContent='Welcome back, '+(ex2.FirstName||'')+'!'; }
+    }
+    goStep(4); showToast('Logged in!','success');
+    setTimeout(()=>window.location.href=nextPage,1200);
+  } else if(wcfOk && wcfPatientId===0){
+    goStep(3);
+  } else {
+    const ex=JSON.parse(localStorage.getItem('sd_user')||'null');
+    if(ex){
+      mirrorPortalUser(ex);
+      document.getElementById('lfWelcomeMsg').textContent='Welcome back, '+ex.Title+' '+ex.FirstName+'!';
+      goStep(4); showToast('Logged in!','success');
+      setTimeout(()=>window.location.href=nextPage,1200);
+    } else {
+      goStep(3);
+    }
+  }
+}
+
+// ── Step 3: Register ───────────────────────────────────────────────────────
+async function completeRegistration(){
+  document.querySelectorAll('.lf-field-err').forEach(e=>e.remove());
+  const mobile=document.getElementById('lfMobile').value.trim();
+  const title=document.getElementById('lfTitle').value;
+  const fn=document.getElementById('lfFirstName').value.trim();
+  const ln=document.getElementById('lfLastName').value.trim();
+  const dob=document.getElementById('lfDOB').value;
+  const gender=document.getElementById('lfGender').value;
+  const email=document.getElementById('lfEmail').value.trim();
+  const address=document.getElementById('lfAddress').value.trim();
+  const city=document.getElementById('lfCity').value.trim();
+  const pincode=document.getElementById('lfPincode').value.trim();
+  let ok=true;
+  if(!title){ addErr('lfTitle','Please select a title.'); ok=false; }
+  if(!fn){ addErr('lfFirstName','Enter your first name.'); ok=false; }
+  if(!ln){ addErr('lfLastName','Enter your last name.'); ok=false; }
+  if(!dob){ addErr('lfDOB','Enter your date of birth.'); ok=false; }
+  if(!gender){ addErr('lfGender','Please select gender.'); ok=false; }
+  if(!address){ addErr('lfAddress','Enter your address (needed for sample pickup).'); ok=false; }
+  if(!ok) return;
+  const pid='PAT'+Date.now();
+  const user={PatientID:pid, MobileNumber:mobile, Title:title, FirstName:fn, LastName:ln, DOB:dob, Gender:gender, Email:email, Address:address, City:city, Pincode:pincode, registeredAt:new Date().toISOString()};
+  try {
+    const res=await LIMS.registerPatient({Phone:mobile,FullName:title+' '+fn+' '+ln,Email:email,Gender:gender,DateOfBirth:dob?new Date(dob).toISOString():null,Address:address,City:city,Pincode:pincode,PasswordHash:mobile});
+    if(res&&res.PatientId>0){ user.PatientID='PAT'+res.PatientId; user.WcfPatientId=res.PatientId; }
+  } catch(e){ console.info('[LIMS] WCF registration unavailable — saving locally'); }
+  localStorage.setItem('sd_user', JSON.stringify(user));
+  mirrorPortalUser(user);
+  const allPats=JSON.parse(localStorage.getItem('sd_all_patients')||'[]');
+  allPats.unshift(user);
+  localStorage.setItem('sd_all_patients', JSON.stringify(allPats));
+  document.getElementById('lfWelcomeMsg').textContent='Welcome, '+title+' '+fn+'!';
+  goStep(4);
+  showToast('Account created!','success');
+  setTimeout(()=>window.location.href=nextPage, 1200);
+}
+
+function addErr(id, msg){
+  const el=document.getElementById(id);
+  if(!el) return;
+  el.style.borderColor='#c62828';
+  const sp=document.createElement('span');
+  sp.className='lf-field-err'; sp.textContent=msg;
+  el.after(sp);
+}
+</script>
+}

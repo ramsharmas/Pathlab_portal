@@ -1,0 +1,76 @@
+@{
+    ViewBag.Title = "Package Details";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section styles {
+<style>
+.pkgd-wrap{max-width:820px;margin:40px auto 60px;padding:0 20px}
+.pkgd-breadcrumb{margin-bottom:20px;font-size:13px;color:#888}
+.pkgd-breadcrumb a{color:#632c76;text-decoration:none}
+.pkgd-card{background:#fff;border:1px solid #e8e0f0;border-radius:18px;overflow:hidden;box-shadow:0 4px 18px rgba(99,44,118,.08)}
+.pkgd-top{background:linear-gradient(135deg,#632c76,#1253be);padding:32px;color:#fff;position:relative}
+.pkgd-badge{position:absolute;top:16px;right:16px;background:rgba(255,255,255,.2);border:1px solid rgba(255,255,255,.4);color:#fff;padding:4px 12px;border-radius:20px;font-size:11px;font-weight:700;text-transform:uppercase}
+.pkgd-top h1{font-size:26px;font-weight:800;margin-bottom:8px}
+.pkgd-top p{opacity:.85;font-size:14px}
+.pkgd-body{padding:28px 32px}
+.pkgd-meta{display:flex;gap:24px;flex-wrap:wrap;margin-bottom:20px;font-size:13px;color:#666}
+.pkgd-meta span{display:flex;align-items:center;gap:6px}
+.pkgd-test-list{list-style:none;padding:0;margin:0 0 24px}
+.pkgd-test-list li{font-size:14px;color:#444;padding:8px 0;border-bottom:1px solid #f5f0fa;display:flex;align-items:center;gap:8px}
+.pkgd-test-list li:before{content:'✓';color:#51ca62;font-weight:700}
+.pkgd-price-row{display:flex;justify-content:space-between;align-items:center;padding-top:20px;border-top:1px solid #f0e8f0}
+.pkgd-price{font-size:28px;font-weight:800;color:#632c76}
+.pkgd-savings{font-size:13px;color:#2e7d32;font-weight:600;margin-top:4px}
+.pkgd-book-btn{background:#632c76;color:#fff;border:none;border-radius:35px 0 35px 35px;padding:14px 32px;font-size:15px;font-weight:700;cursor:pointer;transition:background .3s}
+.pkgd-book-btn:hover{background:#1253be}
+.pkgd-spinner{text-align:center;padding:60px;color:#632c76}
+</style>
+}
+
+<div data-ng-controller="PackageDetailController" data-package-id="@ViewBag.PackageId">
+
+<div class="pkgd-wrap">
+    <div class="pkgd-breadcrumb">
+        <a href="@Url.Action("Index","Home")">Home</a> &gt; <a href="@Url.Action("Packages","Test")">Health Packages</a> &gt; <span>{{pkg.PackageName}}</span>
+    </div>
+
+    <div class="pkgd-spinner" data-ng-show="isLoading"><i class="fa fa-spinner fa-spin fa-3x"></i></div>
+
+    <div class="pkgd-card" data-ng-show="!isLoading && pkg">
+        <div class="pkgd-top">
+            <span class="pkgd-badge" data-ng-show="pkg.Badge">{{pkg.Badge}}</span>
+            <h1>{{pkg.PackageName}}</h1>
+            <p>{{pkg.Description}}</p>
+        </div>
+        <div class="pkgd-body">
+            <div class="pkgd-meta">
+                <span><i class="fa fa-flask"></i> {{pkg.TestCount}} Tests</span>
+                <span><i class="fa fa-tint"></i> {{pkg.SampleType}}</span>
+                <span><i class="fa fa-clock-o"></i> {{pkg.ReportTime}}</span>
+                <span data-ng-show="pkg.Fasting=='Yes'"><i class="fa fa-cutlery"></i> Fasting Required</span>
+            </div>
+            <h3 style="font-size:16px;color:#632c76;margin-bottom:10px">What's Included</h3>
+            <ul class="pkgd-test-list">
+                <li data-ng-repeat="t in includesList">{{t}}</li>
+            </ul>
+            <div class="pkgd-price-row">
+                <div>
+                    <div class="pkgd-price">&#8377;{{pkg.Price}}</div>
+                    <div class="pkgd-savings" data-ng-show="pkg.OriginalPrice && pkg.OriginalPrice > pkg.Price">
+                        <i class="fa fa-tag"></i> Save &#8377;{{pkg.OriginalPrice - pkg.Price}}
+                    </div>
+                </div>
+                <button class="pkgd-book-btn" data-ng-click="bookThisPackage()">
+                    <i class="fa fa-calendar-plus-o"></i> Book This Package
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div data-ng-show="!isLoading && !pkg" style="text-align:center;padding:60px;color:#aaa">
+        <p>Package not found.</p>
+    </div>
+</div>
+
+</div>

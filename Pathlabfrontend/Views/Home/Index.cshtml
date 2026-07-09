@@ -1,0 +1,406 @@
+@{
+    ViewBag.Title = "Home";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div data-ng-controller="HomeController">
+
+<!--=============== HOME COLLECTION LEAD POPUP ======================-->
+<style>[data-ng-cloak]{display:none !important}</style>
+<div class="start-popup" data-ng-cloak data-ng-show="showLeadPopup">
+    <div class="popup-innner-box clearfix">
+        <span class="cross" data-ng-click="closeLeadPopup()">X</span>
+        <div class="start-popup-left">
+            <img src="@Url.Content("~/images/lead-form-popup-bg-desk.png")" alt="Book Free Home Collection">
+        </div>
+        <div class="start-popup-right" data-ng-hide="leadDone">
+            <h5>Book Free Home Collection Today!</h5>
+            <div class="fild-box full-length">
+                <label>Full Name*</label>
+                <input type="text" placeholder="Enter your first and last Name" data-ng-model="lead.name">
+            </div>
+            <div class="fild-box full-length">
+                <label>Mobile Number</label>
+                <input type="tel" maxlength="10" placeholder="Enter 10 digit mobile number" data-ng-model="lead.mobile">
+            </div>
+            <div class="fild-box full-length">
+                <label>City</label>
+                <select data-ng-model="lead.city">
+                    <option>Bhopal</option>
+                    <option>Indore</option>
+                    <option>Jabalpur</option>
+                    <option>Gwalior</option>
+                </select>
+            </div>
+            <div class="fild-box full-length" style="color:#e53e3e;font-size:14px" data-ng-show="leadError">{{leadError}}</div>
+            <div class="fild-box full-length">
+                <button class="btn" data-ng-click="submitLead()">SUBMIT</button>
+            </div>
+        </div>
+        <div class="start-popup-right" data-ng-show="leadDone">
+            <h5>Thank You!</h5>
+            <p style="font-size:16px;color:#555">Our team will contact you shortly to schedule your free home sample collection.</p>
+            <p style="font-size:14px;color:#888;margin-top:14px">Want to book right away?</p>
+            <a href="@Url.Action("BookTest","Test")" class="btn" style="display:inline-block;margin-top:10px">Book a Test Now</a>
+        </div>
+    </div>
+</div>
+
+<!--=============== BANNER SECTION ======================-->
+<div class="banner-outer">
+    <div class="banner-box">
+        <div class="regular slider">
+            <div><a href="@Url.Action("BookTest","Test")"><img src="@Url.Content("~/images/banner2.png")" alt="Book a Test"></a></div>
+            <div><a href="@Url.Action("BookTest","Test")"><img src="@Url.Content("~/images/banner1.png")" alt="Book a Test"></a></div>
+            <div><a href="@Url.Action("BookTest","Test")"><img src="@Url.Content("~/images/banner3.png")" alt="Book a Test"></a></div>
+        </div>
+    </div>
+</div>
+
+<!--=============== BODY SECTION ======================-->
+<div class="home-page">
+
+<!--=============== FEATURE SECTION ======================-->
+<div class="feature-outer">
+    <div class="wrapper-home clearfix">
+        <div class="title-box">
+            <h2>You choose best-in-class diagnostic experiences with Pathlab Diagnostics</h2>
+        </div>
+        <div class="feature-box-left">
+            <div class="feature-inner">
+                <div class="feature-details">
+                    <div class="feature-icon"><img src="@Url.Content("~/images/pillar-1.png")"></div>
+                    <div class="feature-text">
+                        <h4>Best in class customer experience</h4>
+                        <p style="display:block;">Re-imagine and transform the journey for all our stakeholders by addressing the key pain points and bringing a differentiated service proposition</p>
+                    </div>
+                </div>
+                <div class="feature-details">
+                    <div class="feature-icon"><img src="@Url.Content("~/images/pillar-2.png")"></div>
+                    <div class="feature-text">
+                        <h4>Digital first with an analytics powerhouse</h4>
+                        <p>Create a platform that supports end to end digital journey</p>
+                    </div>
+                </div>
+                <div class="feature-details">
+                    <div class="feature-icon"><img src="@Url.Content("~/images/pillar-3.png")"></div>
+                    <div class="feature-text">
+                        <h4>Science led proposition for doctors</h4>
+                        <p>Partner with doctors to shape the diagnostic guidelines through a science led approach</p>
+                    </div>
+                </div>
+                <div class="feature-details">
+                    <div class="feature-icon"><img src="@Url.Content("~/images/pillar-4.png")"></div>
+                    <div class="feature-text">
+                        <h4>Best in class customer experience</h4>
+                        <p>Lead with best-in-class quality standards to cement strong trust with our stakeholders</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="feature-box-right">
+            <img src="@Url.Content("~/images/green-lupin-flower.png")">
+        </div>
+    </div>
+</div>
+
+<!--=============== HOME COLLECTION SECTION ======================-->
+<div class="home-colletion">
+    <div class="wrapper-home-right">
+        <div class="title-box">
+            <h2>Reliable and Safe Home Collection</h2>
+            <p class="sub">For the first time in India, temperature-controlled sample movement &amp; tracking for best quality result. Experience safe &amp; convenient home collection by experts using the latest technology.</p>
+        </div>
+        <div class="home-collection-outer clearfix">
+            <div class="home-collection-box">
+                <div class="collection-pic"><img src="@Url.Content("~/images/step2.png")"></div>
+                <h4>Guaranteed time slots</h4>
+            </div>
+            <div class="home-collection-box">
+                <div class="collection-pic"><img src="@Url.Content("~/images/step3.png")"></div>
+                <h4>Temperature control sample movement and tracking</h4>
+            </div>
+            <div class="home-collection-box">
+                <div class="collection-pic"><img src="@Url.Content("~/images/step1.png")"></div>
+                <h4>Personalised sample collection kit</h4>
+            </div>
+            <div class="home-collection-box">
+                <div class="collection-pic"><img src="@Url.Content("~/images/step4.png")"></div>
+                <h4>Free home sample collection*</h4>
+            </div>
+        </div>
+        <a href="@Url.Action("BookTest","Test")" class="white-btn">Book Home Collection</a>
+    </div>
+</div>
+
+<!--=============== MOST BOOKED TESTS ======================-->
+<!-- Cards come from the unified test catalogue (LIMS SetupTestsuite mapping):
+     name = TestSuiteName, parameters = TestCount, plus website-side Price,
+     Description and TestType badge (Test / Package). -->
+<script src="@Url.Content("~/Scripts/lims-api.js")"></script>
+<div class="book-test-section">
+    <div class="wrapper-home clearfix">
+        <div class="book-test-inner">
+            <div class="title-box">
+                <h2>Most Booked Tests</h2>
+                <p>Preventive, routine, specialised tests so that your health is on track.</p>
+            </div>
+        </div>
+        <div class="test-package-details" style="display:block;">
+            <div class="center-box-outer clearfix">
+                <div class="center-box center-box-two" data-ng-repeat="item in featuredCatalogue">
+                    <div class="center-head">
+                        <h3>{{item.TestSuiteName}} <span>&#8377;{{item.Price}}</span></h3>
+                        <span style="display:inline-block;margin-top:4px;padding:2px 10px;border-radius:10px;font-size:11px;font-weight:600;color:#fff" data-ng-style="{background: item.TestType === 'Package' ? '#e65100' : '#632c76'}">{{item.TestType || 'Test'}}</span>
+                    </div>
+                    <div class="include">
+                        <p>Includes<br>{{item.TestCount}} Test Parameter(s)</p>
+                        <p>{{(item.Description || item.TestSuiteName) | limitTo:90}}{{(item.Description || '').length > 90 ? '…' : ''}} <a href="@Url.Action("BookTest","Test")">Read more</a></p>
+                    </div>
+                    <div class="center-box-btn clearfix">
+                        <a href="@Url.Action("BookTest","Test")">Know more</a>
+                        <a href="javascript:void(0)" data-ng-click="addToCart(item)" class="book-btn" title="Add to Cart"><i class="fa fa-cart-arrow-down"></i></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="btn-box">
+            <a href="@Url.Action("BookTest","Test")" class="btn">View All Test</a>
+        </div>
+    </div>
+</div>
+
+<!--=============== ORGAN SECTION ======================-->
+<div class="organ-section">
+    <div class="wrapper-home clearfix">
+        <div class="gender-box-inner">
+            <div class="gender-box">
+                <div class="intro">
+                    <p>Get to the right test in a few steps</p>
+                    <div class="selct-box">
+                        <select>
+                            <option> Tests by organs</option>
+                            <option> Tests by diseases</option>
+                            <option> Tests by habits</option>
+                        </select>
+                    </div>
+                </div>
+                <ul>
+                    <li class="active"><img src="@Url.Content("~/images/gender-male.png")"> <br> Male</li>
+                    <li><img src="@Url.Content("~/images/gender-female.png")"> <br> Female</li>
+                </ul>
+            </div>
+            <div class="organ-left">
+                <div class="org-outer" style="display:block;">
+                    <img src="@Url.Content("~/images/human-body.png")">
+                    <div class="pic-1"><img src="@Url.Content("~/images/org-1.png")"></div>
+                    <div class="pic-2"><img src="@Url.Content("~/images/org-2.png")"></div>
+                    <div class="pic-3"><img src="@Url.Content("~/images/org-3.png")"></div>
+                    <div class="pic-4"><img src="@Url.Content("~/images/org-4.png")"></div>
+                    <div class="pic-5"><img src="@Url.Content("~/images/org-5.png")"></div>
+                    <div class="pic-6"><img src="@Url.Content("~/images/org-6.png")"></div>
+                    <div class="pic-7"><img src="@Url.Content("~/images/org-7.png")"></div>
+                    <div class="pic-8"><img src="@Url.Content("~/images/org-8.png")"></div>
+                    <div class="pic-9"><img src="@Url.Content("~/images/org-9.png")"></div>
+                </div>
+                <div class="org-outer">
+                    <img src="@Url.Content("~/images/female-body-sceleton.png")">
+                    <div class="pic-11"><img src="@Url.Content("~/images/org11.png")"></div>
+                    <div class="pic-12"><img src="@Url.Content("~/images/org12.png")"></div>
+                    <div class="pic-13"><img src="@Url.Content("~/images/org13.png")"></div>
+                    <div class="pic-14"><img src="@Url.Content("~/images/org14.png")"></div>
+                    <div class="pic-15"><img src="@Url.Content("~/images/org15.png")"></div>
+                    <div class="pic-16"><img src="@Url.Content("~/images/org16.png")"></div>
+                    <div class="pic-17"><img src="@Url.Content("~/images/org17.png")"></div>
+                    <div class="pic-18"><img src="@Url.Content("~/images/org18.png")"></div>
+                    <div class="pic-19"><img src="@Url.Content("~/images/org19.png")"></div>
+                    <div class="pic-20"><img src="@Url.Content("~/images/org20.png")"></div>
+                </div>
+            </div>
+            <a href="@Url.Action("BookTest","Test")" class="btn">View All Test</a>
+        </div>
+    </div>
+</div>
+
+<!--=============== PARTNER SECTION ======================-->
+<div class="partner-section">
+    <div class="wrapper-home">
+        <div class="title-box">
+            <h2>Partner with us</h2>
+        </div>
+        <div class="feature-box-inner clearfix">
+            <div class="feature-box-one">
+                <div class="border-box">
+                    <img src="@Url.Content("~/images/lupimitra.png")">
+                    <h3>Pathlab</h3>
+                    <p>Interested in being a part of the Pathlab Diagnostics franchise network? Here&rsquo;s an opportunity to grow while building India&rsquo;s wellness story.</p>
+                    <a href="@Url.Action("Franchise","Partner")">Know more</a>
+                </div>
+            </div>
+            <div class="feature-box-one">
+                <div class="border-box">
+                    <img src="@Url.Content("~/images/flask-02.png")">
+                    <h3>Hospital Lab Management</h3>
+                    <p>Expertise, trust and care, Pathlab Diagnostics enables hospitals to offer high quality diagnostic care to their patients.</p>
+                    <a href="@Url.Action("HospitalLabManagement","Partner")">Know more</a>
+                </div>
+            </div>
+            <div class="feature-box-one">
+                <div class="border-box">
+                    <img src="@Url.Content("~/images/retail.png")">
+                    <h3>Retail Lab Management</h3>
+                    <p>Retail Laboratory Management is entering into a co-branding space with a local diagnostics brand taking care of infrastructure, manpower and managing overall operations as per company standards.</p>
+                    <a href="@Url.Action("RetailLabManagement","Partner")">Know more</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--=============== VIDEO SECTION ======================-->
+<div class="vide-section">
+    <div class="wrapper-home">
+        <div class="video-bg"></div>
+        <div class="title-box">
+            <h2>Informative Videos</h2>
+        </div>
+        <div class="video-box-outer">
+            <div class="video-box video-one">
+                <img src="@Url.Content("~/images/v1.jpg")">
+                <div class="video-text">
+                    <div class="catagory">Pathology<span><img src="@Url.Content("~/images/clock.png")"> 1 min 57 sec</span></div>
+                    <h3>Pathlab Diagnostics Weighs Venturing into Diagnostics</h3>
+                </div>
+            </div>
+            <div class="video-box video-one">
+                <img src="@Url.Content("~/images/v2.jpg")">
+                <div class="video-text">
+                    <div class="catagory">Pathology<span><img src="@Url.Content("~/images/clock.png")"> 1 min 57 sec</span></div>
+                    <h3>Pathlab Diagnostics backed with 50+ years of Trust and Care</h3>
+                </div>
+            </div>
+        </div>
+        <div class="btn-box">
+            <a href="@Url.Action("Video","Info")" class="btn" style="display:inline-block;">View All Videos</a>
+        </div>
+    </div>
+</div>
+
+<!--=============== TESTIMONIAL SECTION ======================-->
+<div class="testimonial-section">
+    <div class="wrapper-right">
+        <div class="title-box">
+            <h2>Patient Experiences</h2>
+            <p>Words that encourage us, from people like you who trust us</p>
+        </div>
+        <div class="regular-one slider">
+            <div>
+                <div class="clearfix main-testimonial">
+                    <div class="testimonial-text">
+                        <p>It was a great experience for me with your team from sample collection to receiving the test report. I wish you all the best in future endeavors..</p>
+                        <div class="testimonial-pic">
+                            <img src="@Url.Content("~/images/FOc9y7QDmsQYsuV4e9E8.png")">
+                            <h3>Sucharita Pramanik<span>Patient Care Centre - Barasat, Kolkata</span></h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div>
+                <div class="clearfix main-testimonial">
+                    <div class="testimonial-text">
+                        <p>Efficiently sample collected and tested within TAT.</p>
+                        <div class="testimonial-pic">
+                            <img src="@Url.Content("~/images/mseifW1EY4nc425uDuWr.png")">
+                            <h3>Pratima Chowdhury <span>Patient Care Centre - Kolkata</span></h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div>
+                <div class="clearfix main-testimonial">
+                    <div class="testimonial-text">
+                        <p>This is good experience with you and your service. In my opinion, Pathlab Diagnostic best in India.</p>
+                        <div class="testimonial-pic">
+                            <img src="@Url.Content("~/images/qAbsf6QVnRUOR57wIw0K.png")">
+                            <h3>Susmita Dhar <span>Patient Care Centre - Barasat, Kolkata</span></h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div>
+                <div class="clearfix main-testimonial">
+                    <div class="testimonial-text">
+                        <p>I had very noticeable good experience with you and your service.</p>
+                        <div class="testimonial-pic">
+                            <img src="@Url.Content("~/images/AVviy8c7nXXsgmeY2PYb.png")">
+                            <h3>Dr. Bijoy Somani<span>Patient Care Centre - Delhi</span></h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+</div>
+
+<!--=============== POPULAR TEST SECTION ======================-->
+<div class="all-test-section-box">
+    <div class="clearfix">
+        <div class="text-box">
+            <div class="title clearfix">
+                <h3>Popular Test </h3>
+                <div class="line"></div>
+            </div>
+            <ul class="clearfix">
+                <li><a href="@Url.Action("BookTest","Test")">CBC Test </a></li>
+                <li><a href="@Url.Action("BookTest","Test")">Amylase Test </a></li>
+                <li><a href="@Url.Action("BookTest","Test")">Bilirubin Test </a></li>
+                <li><a href="@Url.Action("BookTest","Test")">Blood Glucose Fasting (FBS) </a></li>
+                <li><a href="@Url.Action("BookTest","Test")">C-peptide Test </a></li>
+                <li><a href="@Url.Action("BookTest","Test")">CRP Test </a></li>
+                <li><a href="@Url.Action("BookTest","Test")">Dengue Test </a></li>
+                <li><a href="@Url.Action("BookTest","Test")">Ferritin Test </a></li>
+                <li><a href="@Url.Action("BookTest","Test")">Food Intolerance Test </a></li>
+                <li><a href="@Url.Action("BookTest","Test")">HbA1C test </a></li>
+                <li><a href="@Url.Action("BookTest","Test")">Iron Studies Test </a></li>
+                <li><a href="@Url.Action("BookTest","Test")">Liver Function Test </a></li>
+                <li><a href="@Url.Action("BookTest","Test")">Renal Function Test </a></li>
+            </ul>
+        </div>
+        <div class="text-box">
+            <div class="title clearfix">
+                <h3>Our Presence in Your City</h3>
+                <div class="line"></div>
+            </div>
+        </div>
+        <div class="text-box text-box-last">
+            <div class="title clearfix">
+                <h3>Test by Health Conditions </h3>
+                <div class="line"></div>
+            </div>
+            <ul class="clearfix">
+                <li><a href="@Url.Action("CentreLocator","Company")">Pathology Lab in Mumbai</a></li>
+                <li><a href="@Url.Action("CentreLocator","Company")">Pathology Lab in Pune</a></li>
+                <li><a href="@Url.Action("CentreLocator","Company")">Pathology Lab in Ranchi</a></li>
+                <li><a href="@Url.Action("CentreLocator","Company")">Pathology Lab in Kolkata</a></li>
+                <li><a href="@Url.Action("CentreLocator","Company")">Pathology Lab in Nashik</a></li>
+                <li><a href="@Url.Action("CentreLocator","Company")">Pathology Lab in Indore</a></li>
+                <li><a href="@Url.Action("CentreLocator","Company")">Pathology Lab in Raipur</a></li>
+                <li><a href="@Url.Action("CentreLocator","Company")">Pathology Lab in Varanasi</a></li>
+                <li><a href="@Url.Action("CentreLocator","Company")">Pathology Lab in Jabalpur</a></li>
+                <li><a href="@Url.Action("CentreLocator","Company")">Pathology Lab in Hyderabad</a></li>
+                <li><a href="@Url.Action("CentreLocator","Company")">Pathology Lab in Chennai</a></li>
+                <li><a href="@Url.Action("CentreLocator","Company")">Pathology Lab in Nagpur</a></li>
+                <li><a href="@Url.Action("CentreLocator","Company")">Pathology Lab in Siliguri</a></li>
+                <li><a href="@Url.Action("CentreLocator","Company")">Pathology Lab in Guwahati</a></li>
+                <li><a href="@Url.Action("CentreLocator","Company")">Pathology Lab in Kolhapur</a></li>
+                <li><a href="@Url.Action("CentreLocator","Company")">Pathology Lab in Bengaluru</a></li>
+                <li><a href="@Url.Action("CentreLocator","Company")">Pathology Lab in Darjeeling</a></li>
+                <li><a href="@Url.Action("CentreLocator","Company")">Pathology Lab in Navi Mumbai</a></li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+</div>

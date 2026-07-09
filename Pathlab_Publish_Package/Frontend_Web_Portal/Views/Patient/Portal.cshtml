@@ -1,0 +1,493 @@
+@{
+    ViewBag.Title = "Patient Portal";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section styles {
+<style>
+.sd-portal-layout{display:flex;gap:0;align-items:flex-start;max-width:1180px;margin:28px auto;padding:0 12px}
+.sd-portal-sidebar{width:210px;flex-shrink:0;background:#fff;border:1px solid #e8e0f0;border-radius:14px;overflow:hidden;margin-right:20px}
+.sd-sidebar-user{background:linear-gradient(135deg,#632c76,#1253be);padding:18px 14px;color:#fff}
+.sd-sidebar-user h4{margin:0 0 3px;font-size:15px}
+.sd-sidebar-user p{margin:0;opacity:.8;font-size:12px}
+.sd-sidebar-item{display:flex;align-items:center;gap:10px;padding:11px 14px;font-size:13px;cursor:pointer;color:#444;border-left:3px solid transparent;transition:all .2s;position:relative}
+.sd-sidebar-item:hover{background:#f5f0fa;color:#632c76}
+.sd-sidebar-item.active{background:#f5f0fa;color:#632c76;border-left-color:#632c76;font-weight:600}
+.sd-sidebar-item i{width:16px;text-align:center;color:#632c76;font-size:13px}
+.sd-notif-badge{background:#e53e3e;color:#fff;border-radius:50%;width:18px;height:18px;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;margin-left:auto}
+.sd-portal-content{flex:1;min-width:0}
+.sd-portal-card{background:#fff;border:1px solid #e8e0f0;border-radius:14px;padding:22px;margin-bottom:16px}
+.sd-portal-card h2{font-size:18px;color:#632c76;margin:0 0 16px;display:flex;align-items:center;gap:8px}
+.sd-table{width:100%;border-collapse:collapse}
+.sd-table th{background:#632c76;color:#fff;padding:11px 14px;text-align:left;font-size:12px;font-weight:600}
+.sd-table td{padding:10px 14px;border-bottom:1px solid #f5f0fa;font-size:13px}
+.sd-table tr:last-child td{border-bottom:none}
+.sd-table tr:hover td{background:#faf5ff}
+.sd-status-badge{display:inline-flex;align-items:center;padding:3px 10px;border-radius:12px;font-size:11px;font-weight:700}
+.status-booked{background:#e3f2fd;color:#1565c0}
+.status-confirmed{background:#e8f5e9;color:#2e7d32}
+.status-ready{background:#e0f7fa;color:#00695c}
+.status-pending{background:#fff3e0;color:#e65100}
+.status-processing{background:#f3e5f5;color:#7b1fa2}
+.status-paid{background:#e8f5e9;color:#2e7d32}
+.sd-btn-purple{background:#632c76;color:#fff;border:none;border-radius:35px 0 35px 35px;padding:10px 22px;font-size:14px;font-weight:700;cursor:pointer;transition:background .3s;text-decoration:none;display:inline-flex;align-items:center;gap:6px}
+.sd-btn-purple:hover{background:#1253be;color:#fff}
+.sd-btn-outline{background:#fff;color:#632c76;border:2px solid #632c76;border-radius:35px 0 35px 35px;padding:9px 20px;font-size:13px;font-weight:600;cursor:pointer;transition:all .3s;text-decoration:none;display:inline-flex;align-items:center;gap:6px}
+.sd-btn-outline:hover{background:#f5f0fa}
+.sd-auth-gate{text-align:center;padding:60px 20px}
+.sd-auth-gate i{font-size:56px;color:#632c76;display:block;margin-bottom:16px}
+.sd-form-field{margin-bottom:12px}
+.sd-form-field label{display:block;font-size:12px;font-weight:600;color:#555;margin-bottom:4px}
+.sd-form-field input,.sd-form-field select{width:100%;padding:10px 12px;border:1px solid #ddd;border-radius:8px;font-size:13px;font-family:inherit;box-sizing:border-box}
+.sd-form-field input:focus,.sd-form-field select:focus{border-color:#632c76;outline:none}
+.sd-grid-2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.sd-stat-mini{background:#f5f0fa;border-radius:10px;padding:16px;text-align:center}
+.sd-stat-mini .num{font-size:26px;font-weight:800;color:#632c76}
+.sd-stat-mini .lbl{font-size:12px;color:#888;margin-top:2px}
+.sd-notif-item{display:flex;align-items:flex-start;gap:14px;padding:14px 0;border-bottom:1px solid #f5f0fa}
+.sd-notif-item:last-child{border-bottom:none}
+.sd-notif-icon{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:15px}
+.sd-notif-body{flex:1}
+.sd-notif-title{font-size:14px;font-weight:600;color:#222}
+.sd-notif-time{font-size:12px;color:#aaa;margin-top:2px}
+.sd-notif-unread .sd-notif-title{color:#632c76}
+.sd-record-card{border:1px solid #e8e0f0;border-radius:10px;padding:14px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;gap:12px}
+.sd-record-card:hover{border-color:#632c76;background:#faf5ff}
+.sd-share-box{background:#f8f5fc;border-radius:12px;padding:18px;margin-top:14px}
+.sd-share-link{display:flex;gap:10px;align-items:center;margin-top:8px}
+.sd-share-link input{flex:1;padding:9px 12px;border:1px solid #ddd;border-radius:8px;font-size:13px;background:#fff}
+.sd-help-item{border:1px solid #e8e0f0;border-radius:10px;padding:16px;margin-bottom:10px;cursor:pointer}
+.sd-help-item:hover{border-color:#632c76;background:#faf5ff}
+.sd-help-item h4{font-size:14px;font-weight:600;color:#222;margin:0 0 6px;display:flex;align-items:center;gap:8px}
+.sd-help-item p{font-size:13px;color:#666;margin:0;padding-left:20px}
+.sd-track-steps{display:flex;justify-content:space-between;align-items:flex-start;margin:16px 0}
+.sd-track-step{flex:1;text-align:center;position:relative}
+.sd-track-step:not(:last-child):after{content:'';position:absolute;top:18px;left:60%;width:80%;height:2px;background:#ddd;z-index:0}
+.sd-track-step:not(:last-child).s-done:after{background:#51ca62}
+.sd-track-dot{width:36px;height:36px;border-radius:50%;margin:0 auto 8px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;position:relative;z-index:1;border:2px solid #ddd;background:#fff;color:#aaa}
+.sd-track-step.s-done .sd-track-dot{background:#51ca62;border-color:#51ca62;color:#fff}
+.sd-track-step.s-active .sd-track-dot{background:#632c76;border-color:#632c76;color:#fff}
+.sd-track-lbl{font-size:11px;color:#888;font-weight:600}
+.sd-track-step.s-done .sd-track-lbl,.sd-track-step.s-active .sd-track-lbl{color:#222}
+</style>
+}
+
+<div data-ng-controller="PatientPortalController">
+
+<!-- Auth Gate — routes to the single Account/Login flow (phone -> OTP -> short
+     registration form) instead of a second, duplicate popup. -->
+<div class="sd-auth-gate" data-ng-show="!currentUser">
+    <i class="fa fa-user-circle"></i>
+    <h3>Please Login to Access Your Portal</h3>
+    <p style="color:#888;margin-bottom:20px">View bookings, download reports, track samples and more</p>
+    <a class="sd-btn-purple" href="@Url.Action("Login","Account")?next=@Url.Action("Portal","Patient")"><i class="fa fa-sign-in"></i> Login / Register</a>
+</div>
+
+<!-- Portal (logged in) -->
+<div class="sd-portal-layout" data-ng-show="currentUser">
+
+    <!-- Sidebar -->
+    <div class="sd-portal-sidebar">
+        <div class="sd-sidebar-user">
+            <h4>{{currentUser.FullName}}</h4>
+            <p>{{currentUser.Phone}}</p>
+        </div>
+        <div class="sd-sidebar-item" data-ng-class="{active:activeTab=='dashboard'}" data-ng-click="setTab('dashboard')"><i class="fa fa-tachometer"></i> Dashboard</div>
+        <div class="sd-sidebar-item" data-ng-class="{active:activeTab=='bookings'}" data-ng-click="setTab('bookings')"><i class="fa fa-calendar-check-o"></i> My Bookings</div>
+        <div class="sd-sidebar-item" data-ng-class="{active:activeTab=='track'}" data-ng-click="setTab('track')"><i class="fa fa-map-marker"></i> Track Sample</div>
+        <div class="sd-sidebar-item" data-ng-class="{active:activeTab=='reports'}" data-ng-click="setTab('reports')"><i class="fa fa-file-text-o"></i> My Reports</div>
+        <div class="sd-sidebar-item" data-ng-class="{active:activeTab=='bills'}" data-ng-click="setTab('bills')"><i class="fa fa-credit-card"></i> Bills</div>
+        <div class="sd-sidebar-item" data-ng-class="{active:activeTab=='notifications'}" data-ng-click="setTab('notifications')">
+            <i class="fa fa-bell"></i> Notifications
+            <span class="sd-notif-badge" data-ng-show="unreadCount>0">{{unreadCount}}</span>
+        </div>
+        <div class="sd-sidebar-item" data-ng-class="{active:activeTab=='records'}" data-ng-click="setTab('records')"><i class="fa fa-folder-open-o"></i> Health Records</div>
+        <div class="sd-sidebar-item" data-ng-class="{active:activeTab=='profile'}" data-ng-click="setTab('profile')"><i class="fa fa-user-o"></i> My Profile</div>
+        <div class="sd-sidebar-item" data-ng-class="{active:activeTab=='help'}" data-ng-click="setTab('help')"><i class="fa fa-question-circle-o"></i> Help</div>
+        <div class="sd-sidebar-item" data-ng-click="logout()" style="color:#e53e3e;border-top:1px solid #f0e8f0;margin-top:4px">
+            <i class="fa fa-sign-out" style="color:#e53e3e"></i> Logout
+        </div>
+    </div>
+
+    <!-- Content -->
+    <div class="sd-portal-content">
+
+        <!-- DASHBOARD -->
+        <div data-ng-show="activeTab=='dashboard'">
+            <div class="sd-portal-card">
+                <h2><i class="fa fa-tachometer"></i> Dashboard</h2>
+                <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px;margin-bottom:18px">
+                    <div class="sd-stat-mini"><div class="num">{{bookings.length}}</div><div class="lbl">Total Bookings</div></div>
+                    <div class="sd-stat-mini"><div class="num">{{activeBookingsCount()}}</div><div class="lbl">Active</div></div>
+                    <div class="sd-stat-mini"><div class="num">{{reports.length}}</div><div class="lbl">Reports Ready</div></div>
+                    <div class="sd-stat-mini"><div class="num">{{unreadCount}}</div><div class="lbl">Notifications</div></div>
+                    <div class="sd-stat-mini" data-ng-show="patientDashboard"><div class="num">&#8377;{{patientDashboard.LifetimeSpend}}</div><div class="lbl">Lifetime Spend</div></div>
+                </div>
+                <div style="display:flex;gap:10px;flex-wrap:wrap">
+                    <a href="@Url.Action("BookTest","Test")" class="sd-btn-purple"><i class="fa fa-plus"></i> Book a Test</a>
+                    <button class="sd-btn-outline" data-ng-click="setTab('reports')"><i class="fa fa-file-text-o"></i> My Reports</button>
+                    <button class="sd-btn-outline" data-ng-click="setTab('track')"><i class="fa fa-map-marker"></i> Track Sample</button>
+                </div>
+                <div data-ng-show="recentTests.length>0" style="margin-top:16px">
+                    <div style="font-size:12px;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">Quick Re-book</div>
+                    <div style="display:flex;gap:8px;flex-wrap:wrap">
+                        <button data-ng-repeat="t in recentTests" class="sd-btn-outline" style="padding:7px 14px;font-size:12px" data-ng-click="quickRebook(t)">
+                            <i class="fa fa-repeat"></i> {{t.TestSuiteName}} — &#8377;{{t.Price}}
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="sd-portal-card" data-ng-show="notifications.length>0">
+                <h2><i class="fa fa-bell-o"></i> Recent Notifications
+                    <button class="sd-btn-outline" style="padding:5px 14px;font-size:12px;margin-left:auto" data-ng-click="setTab('notifications')">View all</button>
+                </h2>
+                <div data-ng-repeat="n in notifications | limitTo:3" class="sd-notif-item" data-ng-class="{'sd-notif-unread':!n.read}" data-ng-click="openNotification(n)" style="cursor:pointer">
+                    <div class="sd-notif-icon" data-ng-style="{'background':n.color+'22','color':n.color}"><i class="fa {{n.icon}}"></i></div>
+                    <div class="sd-notif-body">
+                        <div class="sd-notif-title">{{n.title}}</div>
+                        <div style="font-size:13px;color:#555;margin:3px 0">{{n.body}}</div>
+                        <div class="sd-notif-time">{{n.time | date:'dd MMM yyyy, hh:mm a'}}</div>
+                    </div>
+                </div>
+            </div>
+            <div class="sd-portal-card" data-ng-show="bookings.length>0">
+                <h2><i class="fa fa-calendar"></i> Latest Booking Status</h2>
+                <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:14px">
+                    <div>
+                        <div style="font-size:17px;font-weight:700;color:#632c76">{{bookings[0].BookingRef}}</div>
+                        <div style="font-size:12px;color:#888;margin-top:2px">{{bookings[0].Tests.length}} test(s) &nbsp;|&nbsp; &#8377;{{bookings[0].TotalAmount}}</div>
+                    </div>
+                    <span class="sd-status-badge status-{{(bookings[0].BookingStatus||'booked').toLowerCase()}}">{{bookings[0].BookingStatus}}</span>
+                </div>
+                <div class="sd-track-steps">
+                    <div class="sd-track-step" data-ng-class="dashStepClass(0)"><div class="sd-track-dot"><i class="fa fa-check" data-ng-show="dashStep>0"></i><span data-ng-show="dashStep<=0">1</span></div><div class="sd-track-lbl">Booked</div></div>
+                    <div class="sd-track-step" data-ng-class="dashStepClass(1)"><div class="sd-track-dot"><i class="fa fa-check" data-ng-show="dashStep>1"></i><span data-ng-show="dashStep<=1">2</span></div><div class="sd-track-lbl">Collected</div></div>
+                    <div class="sd-track-step" data-ng-class="dashStepClass(2)"><div class="sd-track-dot"><i class="fa fa-check" data-ng-show="dashStep>2"></i><span data-ng-show="dashStep<=2">3</span></div><div class="sd-track-lbl">Processing</div></div>
+                    <div class="sd-track-step" data-ng-class="dashStepClass(3)"><div class="sd-track-dot"><i class="fa fa-check" data-ng-show="dashStep>=3"></i><span data-ng-show="dashStep<3">4</span></div><div class="sd-track-lbl">Ready</div></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- MY BOOKINGS -->
+        <div data-ng-show="activeTab=='bookings'">
+            <div class="sd-portal-card">
+                <h2><i class="fa fa-calendar-check-o"></i> My Bookings</h2>
+                <div data-ng-show="isLoading" style="text-align:center;padding:30px;color:#632c76"><i class="fa fa-spinner fa-spin fa-2x"></i></div>
+                <table class="sd-table" data-ng-show="!isLoading && bookings.length>0">
+                    <thead><tr><th>Booking Ref</th><th>Tests</th><th>Date</th><th>Collection</th><th>Amount</th><th>Status</th><th></th></tr></thead>
+                    <tbody>
+                        <tr data-ng-repeat="b in bookings">
+                            <td><strong style="color:#632c76">{{b.BookingRef}}</strong></td>
+                            <td>{{b.Tests.length}} test(s)</td>
+                            <td>{{b.CreatedAt | date:'dd MMM yy'}}</td>
+                            <td style="text-transform:capitalize">{{b.CollectionType}}</td>
+                            <td>&#8377;{{b.TotalAmount}}</td>
+                            <td><span class="sd-status-badge status-{{(b.BookingStatus||'').toLowerCase()}}">{{b.BookingStatus}}</span></td>
+                            <td style="white-space:nowrap">
+                                <button class="sd-btn-outline" style="padding:5px 12px;font-size:12px" data-ng-click="trackBooking(b)"><i class="fa fa-map-marker"></i> Track</button>
+                                <button class="sd-btn-outline" style="padding:5px 12px;font-size:12px" data-ng-click="rebookBooking(b)"><i class="fa fa-repeat"></i> Re-book</button>
+                                <button class="sd-btn-outline" style="padding:5px 12px;font-size:12px;color:#e53e3e;border-color:#e53e3e" data-ng-show="b.SampleStatus<1 &amp;&amp; b.BookingStatus!='Cancelled'" data-ng-click="cancelBooking(b)"><i class="fa fa-times"></i> Cancel</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div data-ng-show="!isLoading && bookings.length==0" style="text-align:center;padding:40px;color:#aaa">
+                    No bookings yet. <a href="@Url.Action("BookTest","Test")" style="color:#632c76">Book a test</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- TRACK SAMPLE -->
+        <div data-ng-show="activeTab=='track'">
+            <div class="sd-portal-card">
+                <h2><i class="fa fa-map-marker"></i> Track My Sample</h2>
+                <div data-ng-show="bookings.length==0" style="text-align:center;padding:30px;color:#aaa">No active bookings to track.</div>
+                <div data-ng-repeat="b in bookings | limitTo:5" style="border:1px solid #f0e8ff;border-radius:10px;padding:16px;margin-bottom:12px">
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+                        <div><div style="font-size:12px;color:#888;font-weight:600">Booking</div><div style="font-size:16px;font-weight:700;color:#632c76">{{b.BookingRef}}</div></div>
+                        <span class="sd-status-badge status-{{(b.BookingStatus||'').toLowerCase()}}">{{b.BookingStatus}}</span>
+                    </div>
+                    <div data-ng-show="b.SampleId" style="display:flex;flex-wrap:wrap;gap:16px;background:#fff;border:1px dashed #b79cc7;border-radius:8px;padding:8px 14px;margin-bottom:12px;font-size:13px;color:#555">
+                        <span>Sample ID: <strong style="color:#222;letter-spacing:.5px">{{b.SampleId}}</strong></span>
+                        <span data-ng-show="b.Barcode">Barcode: <strong style="font-family:monospace;color:#222;letter-spacing:2px">{{b.Barcode}}</strong></span>
+                        <span>LIMS Job: <strong style="color:#632c76">{{b.LimsJobId || 'sync pending'}}</strong></span>
+                    </div>
+                    <div class="sd-track-steps">
+                        <div class="sd-track-step" data-ng-class="stepClass(b,0)"><div class="sd-track-dot"><i class="fa fa-check" data-ng-show="b.SampleStatus>0"></i><span data-ng-show="b.SampleStatus<=0">1</span></div><div class="sd-track-lbl">Booked</div></div>
+                        <div class="sd-track-step" data-ng-class="stepClass(b,1)"><div class="sd-track-dot"><i class="fa fa-check" data-ng-show="b.SampleStatus>1"></i><span data-ng-show="b.SampleStatus<=1">2</span></div><div class="sd-track-lbl">Collected</div></div>
+                        <div class="sd-track-step" data-ng-class="stepClass(b,2)"><div class="sd-track-dot"><i class="fa fa-check" data-ng-show="b.SampleStatus>2"></i><span data-ng-show="b.SampleStatus<=2">3</span></div><div class="sd-track-lbl">At Lab</div></div>
+                        <div class="sd-track-step" data-ng-class="stepClass(b,3)"><div class="sd-track-dot"><i class="fa fa-check" data-ng-show="b.SampleStatus>3"></i><span data-ng-show="b.SampleStatus<=3">4</span></div><div class="sd-track-lbl">Processing</div></div>
+                        <div class="sd-track-step" data-ng-class="stepClass(b,4)"><div class="sd-track-dot"><i class="fa fa-check" data-ng-show="b.SampleStatus>=4"></i><span data-ng-show="b.SampleStatus<4">5</span></div><div class="sd-track-lbl">Ready</div></div>
+                    </div>
+                    <div data-ng-show="b.CollectionType=='home'" style="background:#f8f5fc;border-radius:8px;padding:10px 14px;margin-top:14px;font-size:13px;color:#555">
+                        <i class="fa fa-user-md" style="color:#632c76"></i>&nbsp; Phlebotomist: <strong>{{phleb(b).name}}</strong> &nbsp;<a href="tel:{{phleb(b).phone}}" style="color:#632c76">{{phleb(b).phone}}</a>
+                        <span data-ng-show="b.SampleStatus<1"> &nbsp;·&nbsp; Expected arrival: <strong>{{b.TimeSlot}}</strong><span data-ng-show="b.CollectionDate"> on <strong>{{b.CollectionDate | date:'dd MMM'}}</strong></span></span>
+                        <span data-ng-show="b.SampleStatus>=1" style="color:#2e7d32"> &nbsp;·&nbsp; <i class="fa fa-check"></i> Sample collected</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- MY REPORTS -->
+        <div data-ng-show="activeTab=='reports'">
+            <div class="sd-portal-card">
+                <h2><i class="fa fa-file-text-o"></i> My Reports</h2>
+                <table class="sd-table" data-ng-show="reports.length>0">
+                    <thead><tr><th>Booking Ref</th><th>Tests</th><th>Date</th><th>Status</th><th>Action</th></tr></thead>
+                    <tbody>
+                        <tr data-ng-repeat="r in reports">
+                            <td><strong style="color:#632c76">{{r.BookingRef}}</strong></td>
+                            <td style="max-width:180px;word-break:break-word;font-size:12px">{{r.TestNames}}</td>
+                            <td>{{r.ReportDate | date:'dd MMM yyyy'}}</td>
+                            <td><span class="sd-status-badge" data-ng-class="r.Status=='Ready'?'status-ready':'status-pending'">{{r.Status}}</span></td>
+                            <td style="white-space:nowrap">
+                                <button data-ng-show="r.ReportFilePath" class="sd-btn-outline" style="padding:5px 12px;font-size:12px" data-ng-click="startReportOtp(r,$event)"><i class="fa fa-lock"></i> Download</button>
+                                <button data-ng-show="r.ReportFilePath" class="sd-btn-outline" style="padding:5px 12px;font-size:12px;margin-left:4px" data-ng-click="shareReport(r,$event)"><i class="fa fa-share-alt"></i></button>
+                                <span data-ng-hide="r.ReportFilePath" style="color:#aaa;font-size:12px">Processing…</span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div data-ng-show="reports.length==0" style="text-align:center;padding:40px;color:#aaa">No reports available yet.</div>
+                <div data-ng-show="reports.length>0" style="margin-top:14px">
+                    <a href="@Url.Action("BookTest","Test")" class="sd-btn-purple"><i class="fa fa-plus"></i> Book Follow-up Test</a>
+                </div>
+                <div class="sd-share-box" data-ng-show="dlPanel.visible">
+                    <div style="font-size:14px;font-weight:600;color:#632c76;margin-bottom:8px"><i class="fa fa-lock"></i> Secure Download — {{dlPanel.ref}}</div>
+                    <p style="font-size:13px;color:#555;margin-bottom:10px" data-ng-show="dlPanel.live">Enter the OTP sent to your registered mobile number to unlock the download.</p>
+                    <p style="font-size:13px;color:#888;margin-bottom:10px" data-ng-hide="dlPanel.live">Enter OTP to unlock the download. <span style="color:#aaa">(Demo OTP: <strong>123456</strong>)</span></p>
+                    <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
+                        <input type="tel" maxlength="6" placeholder="6-digit OTP" data-ng-model="dlPanel.entered" style="width:140px;padding:10px 14px;border:2px solid #ddd;border-radius:8px;font-size:16px;font-weight:700;letter-spacing:4px;text-align:center">
+                        <button class="sd-btn-purple" style="padding:10px 18px;font-size:13px" data-ng-click="verifyReportOtp()"><i class="fa fa-unlock"></i> Verify &amp; Download</button>
+                        <button class="sd-btn-outline" style="padding:9px 14px;font-size:13px" data-ng-click="dlPanel.visible=false">Cancel</button>
+                    </div>
+                    <div style="color:#e53e3e;font-size:13px;margin-top:8px" data-ng-show="dlPanel.error">{{dlPanel.error}}</div>
+                </div>
+                <div class="sd-share-box" data-ng-show="sharePanel.visible">
+                    <div style="font-size:14px;font-weight:600;color:#632c76;margin-bottom:8px"><i class="fa fa-share-alt"></i> Share Report — {{sharePanel.ref}}</div>
+                    <div data-ng-show="sharePanel.loading" style="font-size:13px;color:#888"><i class="fa fa-spinner fa-spin"></i> Generating a secure link…</div>
+                    <div data-ng-hide="sharePanel.loading">
+                    <div class="sd-share-link"><input type="text" value="{{sharePanel.link}}" readonly><button class="sd-btn-purple" style="padding:9px 16px;font-size:13px" data-ng-click="copyShareLink()"><i class="fa fa-copy"></i> Copy</button></div>
+                    <div style="display:flex;gap:10px;margin-top:10px;flex-wrap:wrap">
+                        <a href="https://wa.me/?text={{sharePanel.waText}}" target="_blank" class="sd-btn-purple" style="padding:9px 16px;font-size:13px;background:#25d366"><i class="fa fa-whatsapp"></i> WhatsApp</a>
+                        <a href="mailto:?subject=Lab Report&body={{sharePanel.link}}" class="sd-btn-purple" style="padding:9px 16px;font-size:13px;background:#1253be"><i class="fa fa-envelope"></i> Email</a>
+                        <button class="sd-btn-outline" style="padding:8px 14px;font-size:13px" data-ng-click="sharePanel.visible=false">Close</button>
+                    </div>
+                    </div>
+                    <div style="margin-top:14px;padding-top:14px;border-top:1px solid #ede8f5">
+                        <div style="font-size:13px;font-weight:600;color:#632c76;margin-bottom:8px"><i class="fa fa-user-md"></i> Share directly with your doctor</div>
+                        <div style="display:flex;gap:8px;flex-wrap:wrap">
+                            <input type="text" placeholder="Doctor's name (optional)" data-ng-model="doctorShare.name" style="flex:1;min-width:140px;padding:8px 10px;border:1px solid #ddd;border-radius:8px;font-size:13px">
+                            <input type="email" placeholder="Doctor's email" data-ng-model="doctorShare.email" style="flex:1;min-width:160px;padding:8px 10px;border:1px solid #ddd;border-radius:8px;font-size:13px">
+                            <button class="sd-btn-purple" style="padding:8px 16px;font-size:13px" data-ng-click="shareWithDoctor()"><i class="fa fa-paper-plane"></i> Send</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- BILLS -->
+        <div data-ng-show="activeTab=='bills'">
+            <div class="sd-portal-card">
+                <h2><i class="fa fa-credit-card"></i> Bills &amp; Payments</h2>
+                <table class="sd-table" data-ng-show="bookings.length>0">
+                    <thead><tr><th>Booking Ref</th><th>Date</th><th>Tests</th><th>Amount</th><th>Method</th><th>Status</th><th>Action</th></tr></thead>
+                    <tbody>
+                        <tr data-ng-repeat="b in bookings">
+                            <td><strong style="color:#632c76">{{b.BookingRef}}</strong></td>
+                            <td>{{b.CreatedAt | date:'dd MMM yy'}}</td>
+                            <td>{{b.Tests.length}}</td>
+                            <td>&#8377;{{b.TotalAmount}}</td>
+                            <td style="text-transform:capitalize">{{b.PaymentMethod || 'Counter'}}</td>
+                            <td><span class="sd-status-badge" data-ng-class="b.PaymentStatus=='Paid'?'status-paid':'status-pending'">{{b.PaymentStatus || 'Pending'}}</span></td>
+                            <td style="white-space:nowrap">
+                                <button class="sd-btn-outline" style="padding:5px 12px;font-size:12px" data-ng-click="downloadInvoice(b)"><i class="fa fa-download"></i> Invoice</button>
+                                <button class="sd-btn-purple" style="padding:5px 12px;font-size:12px;margin-left:4px" data-ng-show="b.PaymentStatus!='Paid'" data-ng-click="payNow(b)"><i class="fa fa-credit-card"></i> Pay Now</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div data-ng-show="bookings.length==0" style="text-align:center;padding:40px;color:#aaa">No payment records found.</div>
+            </div>
+        </div>
+
+        <!-- NOTIFICATIONS -->
+        <div data-ng-show="activeTab=='notifications'">
+            <div class="sd-portal-card">
+                <h2><i class="fa fa-bell"></i> Notifications
+                    <button class="sd-btn-outline" style="padding:5px 14px;font-size:12px;margin-left:auto" data-ng-click="markAllRead()">Mark all read</button>
+                </h2>
+                <div data-ng-show="pushSupported && pushPermission!='granted'" style="background:#f8f5fc;border-radius:10px;padding:12px 16px;margin-bottom:16px;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap">
+                    <span style="font-size:13px;color:#555"><i class="fa fa-bell-o"></i> Get a notification on this device the moment something changes, even if this tab is in the background.</span>
+                    <button class="sd-btn-purple" style="padding:7px 16px;font-size:13px" data-ng-click="enablePushNotifications()" data-ng-show="pushPermission!='denied'">Enable</button>
+                    <span style="font-size:12px;color:#c62828" data-ng-show="pushPermission=='denied'">Blocked in browser settings</span>
+                </div>
+                <div style="border:1px solid #ede8f5;border-radius:10px;padding:14px 16px;margin-bottom:16px" data-ng-show="notifPrefs.length">
+                    <div style="font-size:13px;font-weight:600;color:#632c76;margin-bottom:10px"><i class="fa fa-sliders"></i> Notification Preferences</div>
+                    <div data-ng-repeat="p in notifPrefs" style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;font-size:13px;border-bottom:1px solid #f5f0fa">
+                        <span style="color:#444">{{p.label}} <span style="color:#aaa;font-size:11px">({{p.Channel}})</span></span>
+                        <label style="display:flex;align-items:center;gap:6px;cursor:pointer">
+                            <input type="checkbox" data-ng-model="p.Enabled" data-ng-change="toggleNotifPreference(p)">
+                        </label>
+                    </div>
+                </div>
+                <div data-ng-repeat="n in notifications" class="sd-notif-item" data-ng-class="{'sd-notif-unread':!n.read}" data-ng-click="openNotification(n)" style="cursor:pointer">
+                    <div class="sd-notif-icon" data-ng-style="{'background':n.color+'22','color':n.color}"><i class="fa {{n.icon}}"></i></div>
+                    <div class="sd-notif-body">
+                        <div class="sd-notif-title">{{n.title}}</div>
+                        <div style="font-size:13px;color:#555;margin:3px 0">{{n.body}}</div>
+                        <div class="sd-notif-time">{{n.time | date:'dd MMM yyyy, hh:mm a'}}</div>
+                    </div>
+                    <div data-ng-show="!n.read" style="width:8px;height:8px;border-radius:50%;background:#632c76;flex-shrink:0;margin-top:6px"></div>
+                </div>
+                <div data-ng-show="notifications.length==0" style="text-align:center;padding:40px;color:#aaa"><i class="fa fa-bell-slash-o fa-2x" style="display:block;margin-bottom:10px"></i>No notifications yet.</div>
+            </div>
+        </div>
+
+        <!-- HEALTH RECORDS -->
+        <div data-ng-show="activeTab=='records'">
+            <div class="sd-portal-card">
+                <h2><i class="fa fa-folder-open-o"></i> Health Records</h2>
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:10px">
+                    <p style="color:#888;font-size:13px;margin:0">All lab reports auto-archived here. Upload old documents below.</p>
+                    <label class="sd-btn-purple" style="cursor:pointer"><i class="fa fa-upload"></i> Upload Document<input type="file" accept="image/*,.pdf" style="display:none" onchange="angular.element(this).scope().uploadDocument(this.files[0]); angular.element(this).scope().$apply();"></label>
+                </div>
+                <div data-ng-repeat="r in allRecords" class="sd-record-card">
+                    <div style="display:flex;align-items:center;gap:12px">
+                        <div style="width:40px;height:40px;border-radius:10px;background:#f5f0fa;display:flex;align-items:center;justify-content:center">
+                            <i class="fa fa-file-pdf-o" style="color:#632c76;font-size:18px"></i>
+                        </div>
+                        <div>
+                            <div style="font-size:14px;font-weight:600;color:#222">{{r.TestNames}}</div>
+                            <div style="font-size:12px;color:#888">{{r.ReportDate | date:'dd MMM yyyy'}} &nbsp;|&nbsp; {{r.BookingRef}}</div>
+                        </div>
+                    </div>
+                    <div style="display:flex;gap:8px;flex-shrink:0">
+                        <a data-ng-show="r.ReportFilePath" href="{{r.ReportFilePath}}" target="_blank" class="sd-btn-outline" style="padding:6px 14px;font-size:12px"><i class="fa fa-eye"></i> View</a>
+                        <a data-ng-show="r.ReportFilePath" href="{{r.ReportFilePath}}" download="{{r.TestNames}}" class="sd-btn-outline" style="padding:6px 12px;font-size:12px"><i class="fa fa-download"></i></a>
+                        <button data-ng-show="!r.IsUpload" class="sd-btn-outline" style="padding:6px 12px;font-size:12px" data-ng-click="shareReport(r,$event)"><i class="fa fa-share-alt"></i></button>
+                        <button data-ng-show="r.IsUpload" class="sd-btn-outline" style="padding:6px 12px;font-size:12px;color:#e53e3e;border-color:#e53e3e" data-ng-click="removeUploadedRecord(r)"><i class="fa fa-trash"></i></button>
+                    </div>
+                </div>
+                <div data-ng-show="allRecords.length==0" style="text-align:center;padding:40px;color:#aaa"><i class="fa fa-folder-open-o fa-2x" style="display:block;margin-bottom:10px"></i>No health records yet.</div>
+            </div>
+        </div>
+
+        <!-- MY PROFILE -->
+        <div data-ng-show="activeTab=='profile'">
+            <div class="sd-portal-card">
+                <h2><i class="fa fa-user-o"></i> My Profile</h2>
+                <div class="sd-grid-2">
+                    <div class="sd-form-field"><label>Full Name</label><input type="text" data-ng-model="profileEdit.FullName"></div>
+                    <div class="sd-form-field">
+                        <label>Phone</label>
+                        <div style="display:flex;gap:8px">
+                            <input type="text" data-ng-model="profileEdit.Phone" readonly style="background:#f5f5f5;flex:1">
+                            <button class="sd-btn-outline" style="padding:8px 14px;font-size:12px;white-space:nowrap" data-ng-click="startPhoneChange()"><i class="fa fa-pencil"></i> Change</button>
+                        </div>
+                    </div>
+                    <div class="sd-form-field"><label>Email</label><input type="email" data-ng-model="profileEdit.Email"></div>
+                    <div class="sd-form-field"><label>Gender</label>
+                        <select data-ng-model="profileEdit.Gender"><option value="">--</option><option value="Male">Male</option><option value="Female">Female</option><option value="Other">Other</option></select>
+                    </div>
+                    <div class="sd-form-field"><label>Date of Birth</label><input type="date" data-ng-model="profileEdit.DateOfBirth"></div>
+                    <div class="sd-form-field"><label>City</label><input type="text" data-ng-model="profileEdit.City"></div>
+                    <div class="sd-form-field" style="grid-column:span 2"><label>Address</label><input type="text" data-ng-model="profileEdit.Address"></div>
+                    <div class="sd-form-field"><label>Pincode</label><input type="text" data-ng-model="profileEdit.Pincode"></div>
+                </div>
+                <div class="sd-share-box" data-ng-show="phoneChange.open">
+                    <div style="font-size:14px;font-weight:600;color:#632c76;margin-bottom:8px"><i class="fa fa-mobile"></i> Change Phone Number</div>
+                    <div data-ng-show="phoneChange.step=='enter'" style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
+                        <input type="tel" maxlength="10" placeholder="New 10-digit mobile number" data-ng-model="phoneChange.newPhone" style="width:220px;padding:10px 14px;border:1px solid #ddd;border-radius:8px;font-size:14px">
+                        <button class="sd-btn-purple" style="padding:10px 18px;font-size:13px" data-ng-click="sendPhoneChangeOtp()"><i class="fa fa-paper-plane"></i> Send OTP</button>
+                        <button class="sd-btn-outline" style="padding:9px 14px;font-size:13px" data-ng-click="phoneChange.open=false">Cancel</button>
+                    </div>
+                    <div data-ng-show="phoneChange.step=='otp'">
+                        <p style="font-size:13px;color:#555;margin-bottom:10px">Enter the OTP sent to <strong>{{phoneChange.newPhone}}</strong> to verify your new number.</p>
+                        <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
+                            <input type="tel" maxlength="6" placeholder="6-digit OTP" data-ng-model="phoneChange.otp" style="width:140px;padding:10px 14px;border:2px solid #ddd;border-radius:8px;font-size:16px;font-weight:700;letter-spacing:4px;text-align:center">
+                            <button class="sd-btn-purple" style="padding:10px 18px;font-size:13px" data-ng-click="verifyPhoneChange()"><i class="fa fa-check"></i> Verify &amp; Update</button>
+                            <button class="sd-btn-outline" style="padding:9px 14px;font-size:13px" data-ng-click="phoneChange.open=false">Cancel</button>
+                        </div>
+                    </div>
+                </div>
+                <button class="sd-btn-purple" data-ng-click="saveProfile()" style="margin-top:14px"><i class="fa fa-save"></i> Save Changes</button>
+            </div>
+
+            <div class="sd-portal-card" style="margin-top:20px">
+                <h2><i class="fa fa-users"></i> Family Members</h2>
+                <table class="sd-table" data-ng-show="familyMembers.length>0">
+                    <thead><tr><th>Name</th><th>Relation</th><th>Age</th><th>Gender</th><th></th></tr></thead>
+                    <tbody>
+                        <tr data-ng-repeat="m in familyMembers">
+                            <td>{{m.Name}}</td>
+                            <td>{{m.Relation}}</td>
+                            <td>{{m.Age}}</td>
+                            <td>{{m.Gender}}</td>
+                            <td><button class="sd-btn-outline" style="padding:5px 12px;font-size:12px;color:#e53e3e;border-color:#e53e3e" data-ng-click="removeFamilyMember($index)"><i class="fa fa-trash"></i></button></td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div data-ng-show="familyMembers.length==0" style="color:#aaa;font-size:13px;margin-bottom:14px">No family members added yet. Add them here to book tests on their behalf.</div>
+                <div class="sd-grid-2" style="margin-top:10px">
+                    <div class="sd-form-field"><label>Name</label><input type="text" data-ng-model="newMember.Name"></div>
+                    <div class="sd-form-field"><label>Relation</label>
+                        <select data-ng-model="newMember.Relation"><option value="">--</option><option>Spouse</option><option>Child</option><option>Parent</option><option>Sibling</option><option>Other</option></select>
+                    </div>
+                    <div class="sd-form-field"><label>Age</label><input type="number" data-ng-model="newMember.Age" min="0"></div>
+                    <div class="sd-form-field"><label>Gender</label>
+                        <select data-ng-model="newMember.Gender"><option value="">--</option><option>Male</option><option>Female</option><option>Other</option></select>
+                    </div>
+                </div>
+                <button class="sd-btn-purple" data-ng-click="addFamilyMember()" style="margin-top:14px"><i class="fa fa-plus"></i> Add Family Member</button>
+            </div>
+        </div>
+
+        <!-- HELP -->
+        <div data-ng-show="activeTab=='help'">
+            <div class="sd-portal-card">
+                <h2><i class="fa fa-question-circle-o"></i> Help &amp; Support</h2>
+                <div class="sd-help-item" data-ng-repeat="h in helpItems" data-ng-click="h.open=!h.open">
+                    <h4><i class="fa" data-ng-class="h.open?'fa-chevron-down':'fa-chevron-right'"></i> {{h.q}}</h4>
+                    <p data-ng-show="h.open">{{h.a}}</p>
+                </div>
+                <div style="margin-top:20px;padding-top:16px;border-top:1px solid #f0e8f0">
+                    <h3 style="font-size:15px;color:#222;margin-bottom:12px"><i class="fa fa-headphones" style="color:#632c76;margin-right:8px"></i>Contact Support</h3>
+                    <div style="display:flex;gap:12px;flex-wrap:wrap">
+                        <a href="tel:8269331264" class="sd-btn-purple"><i class="fa fa-phone"></i> Call: 8269331264</a>
+                        <a href="https://wa.me/918269331264" target="_blank" class="sd-btn-purple" style="background:#25d366"><i class="fa fa-whatsapp"></i> WhatsApp</a>
+                        <a href="mailto:support@swapnildiagnostics.com" class="sd-btn-outline"><i class="fa fa-envelope"></i> Email Us</a>
+                    </div>
+                </div>
+
+                <!-- Branch Locator — real branches, same list used at checkout -->
+                <div style="margin-top:20px;padding-top:16px;border-top:1px solid #f0e8f0">
+                    <h3 style="font-size:15px;color:#222;margin-bottom:12px"><i class="fa fa-map-marker" style="color:#632c76;margin-right:8px"></i>Our Branches</h3>
+                    <div data-ng-repeat="b in branches" style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid #f5f0fa;font-size:13px">
+                        <span style="color:#333">{{b.name}}</span>
+                        <a href="tel:{{b.phone}}" style="color:#632c76;font-weight:600"><i class="fa fa-phone"></i> {{b.phone}}</a>
+                    </div>
+                </div>
+
+                <!-- Raise a Complaint / Feedback — real, self-hosted (see PathlabService.SubmitFeedback) -->
+                <div style="margin-top:20px;padding-top:16px;border-top:1px solid #f0e8f0">
+                    <h3 style="font-size:15px;color:#222;margin-bottom:12px"><i class="fa fa-exclamation-circle" style="color:#632c76;margin-right:8px"></i>Raise a Complaint / Feedback</h3>
+                    <div data-ng-hide="feedbackSent">
+                        <div class="sd-form-field">
+                            <textarea data-ng-model="feedback.message" rows="4" placeholder="Tell us what went wrong or how we can improve…" style="width:100%;padding:10px 12px;border:1px solid #ddd;border-radius:8px;font-size:13px;font-family:inherit;box-sizing:border-box"></textarea>
+                        </div>
+                        <button class="sd-btn-purple" data-ng-click="submitFeedback()"><i class="fa fa-paper-plane"></i> Submit</button>
+                    </div>
+                    <div data-ng-show="feedbackSent" style="background:#e8f5e9;border-radius:10px;padding:14px;color:#2e7d32;font-size:13px">
+                        <i class="fa fa-check-circle"></i> Thanks — our team will get back to you shortly.
+                        <button data-ng-click="feedbackSent=false" style="background:none;border:none;color:#2e7d32;text-decoration:underline;cursor:pointer;font-size:12px;margin-left:8px">Submit another</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div><!-- end sd-portal-content -->
+</div><!-- end sd-portal-layout -->
+
+<div class="sd-toast" id="sdToast"></div>
+</div>

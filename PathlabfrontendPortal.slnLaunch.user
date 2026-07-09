@@ -1,0 +1,15 @@
+[
+  {
+    "Name": "New Profile",
+    "Projects": [
+      {
+        "Path": "Pathlabfrontend\\Pathlabfrontend.csproj",
+        "Action": "Start"
+      },
+      {
+        "Path": "WcfPathlabService\\PathlabWcfService.csproj",
+        "Action": "Start"
+      }
+    ]
+  }
+]

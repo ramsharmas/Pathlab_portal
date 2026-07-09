@@ -1,0 +1,49 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!-- https://go.microsoft.com/fwlink/?LinkID=208121. -->
+<Project>
+  <PropertyGroup>
+    <_PublishTargetUrl>C:\Users\Mudit\Desktop\publish_BackendService</_PublishTargetUrl>
+    <History>True|2026-07-08T08:42:43.7733191Z||;</History>
+  </PropertyGroup>
+  <ItemGroup>
+    <File Include="bin/BCrypt.Net-Next.dll">
+      <publishTime>03/03/2022 21:40:20</publishTime>
+    </File>
+    <File Include="bin/EntityFramework.dll">
+      <publishTime>04/17/2020 02:08:42</publishTime>
+    </File>
+    <File Include="bin/EntityFramework.SqlServer.dll">
+      <publishTime>04/17/2020 02:08:56</publishTime>
+    </File>
+    <File Include="bin/PathlabWcfService.dll">
+      <publishTime>07/08/2026 14:12:43</publishTime>
+    </File>
+    <File Include="bin/PathlabWcfService.pdb">
+      <publishTime>07/08/2026 14:12:43</publishTime>
+    </File>
+    <File Include="bin/System.Buffers.dll">
+      <publishTime>02/19/2020 10:05:18</publishTime>
+    </File>
+    <File Include="bin/System.Memory.dll">
+      <publishTime>02/19/2020 10:05:18</publishTime>
+    </File>
+    <File Include="bin/System.Numerics.Vectors.dll">
+      <publishTime>05/15/2018 13:29:44</publishTime>
+    </File>
+    <File Include="bin/System.Runtime.CompilerServices.Unsafe.dll">
+      <publishTime>10/23/2021 05:10:18</publishTime>
+    </File>
+    <File Include="Global.asax">
+      <publishTime>06/29/2026 19:44:43</publishTime>
+    </File>
+    <File Include="packages.config">
+      <publishTime>06/29/2026 20:38:13</publishTime>
+    </File>
+    <File Include="PathlabService.svc">
+      <publishTime>06/29/2026 19:44:29</publishTime>
+    </File>
+    <File Include="Web.config">
+      <publishTime>07/08/2026 12:35:28</publishTime>
+    </File>
+  </ItemGroup>
+</Project>

@@ -1,0 +1,154 @@
+﻿@{
+    ViewBag.Title = "COVID Tests and Packages";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<!--=============== BANNER SECTION ======================-->
+<div class="banner-outer">
+	<div class="banner-box">
+    	<img src="@Url.Content("~/images/pakages-banner.png")">
+    </div> 
+</div>
+ 
+<!--=============== BODY SECTION ======================-->
+<div class="inner-page-section why-section">
+	<div class="wrapper clearfix">
+    	<div class="path-box">
+        	<p><a href="@Url.Action("Index","Home")">Home</a> &gt; <span>COVID Tests and Packages</span></p>
+        </div>
+        <div class="body-section">
+            <h1>Covid RT PCR Test</h1> 
+            <p>The outbreak of the new coronavirus disease, which was first detected in China in December 2019, is continuing to affect people across the globe. We have observed three waves of this disease in India so far.</p> 
+            <p>Early and accurate diagnosis of COVID-19 disease caused by the novel coronavirus now called SARS CoV-2 is critical to curbing its spread and improving health outcomes.</p>
+             
+             <div class="covit-box clearfix">
+                <div class="covit-left-left">
+                    <h2>Who should get tested for Covid-19 infection</h2>
+                    <ul>
+                        <li>People who have symptoms of COVID-19.</li>
+                        <li>Most people who have had close contact (within 6 feet for a total of 15 minutes or more over 24 hours) with someone with confirmed COVID-19.
+                            <ul>
+                                <li>Fully vaccinated people with no COVID-19 symptoms do not need to be tested following exposure to someone with COVID-19.</li>
+                                <li>People who have tested positive for COVID-19 within the past three months and recovered do not need to get tested following exposure as long as they do not develop new symptoms.</li>
+                            </ul>
+                        </li>
+                        <li>People who have taken part in activities that put them at higher risk for COVID-19 because they cannot distance themselves as needed to avoid exposure, such as travel, attending large social or mass gatherings, or being in crowded or poorly-ventilated indoor settings.</li>
+                        <li>People asked or referred to get tested by their healthcare provider or state, tribal or territorial health department.</li> 
+                    </ul>
+                    <p>CDC recommends that anyone with any signs or symptoms of COVID-19 get tested, regardless of vaccination status or prior infection. If you get tested because you have symptoms or were potentially exposed to the virus, you should stay away from others pending test results and follow the advice of your health care provider or a public health professional.</p>
+                </div>
+                <div class="covit-left-right">
+                    <img src="@Url.Content("~/images/who-should-get-tested-for-covid.jpg")">
+                </div>
+             </div>
+             
+            <h2>Latest ICMR Guidelines</h2>
+            <h3>A. In community settings:</h3> 
+            <ul>
+                <li>Symptomatic (cough, fever, sore throat, loss of taste and/or smell, breathlessness and/or other respiratory symptoms).</li>
+                <li>At-risk contacts of laboratory-confirmed cases. [At-risk contacts are elderly (>60yr) and individuals with comorbidity such as diabetes, hypertension, chronic lung or kidney disease, malignancy, obesity etc.]</li>
+                <li>Individuals undertaking international travel (as per country-specific requirements</li>
+                <li>International travelers arriving at Indian airports/seaports/ports of entry according to the laid down guidelines.</li>
+            </ul> 
+            <h3>In Hospital Settings:</h3> 
+            <ul>
+                <li>Testing may be undertaken at the discretion of the treating doctor with the following considerations:
+                    <ul>
+                        <li>At-risk contacts of laboratory-confirmed cases. [At-risk contacts are elderly (>60yr) and individuals with comorbidity such as diabetes, hypertension, chronic lung or kidney disease, malignancy, obesity etc.]</li>
+                        <li>Individuals undertaking international travel (as per country-specific requirements
+                            <ul>
+                                <li>International travelers arriving at Indian airports/seaports/ports of entry according to the laid down guidelines.</li>
+                            </ul>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+             <br>
+             <br>
+             <br>
+            <h2>Who should not get tested for current infection</h2> 
+            <ul>
+                <li>Asymptomatic individuals in community settings.</li>
+                <li>Contacts of confirmed cases of COVID-19 unless identified as high risk based on age or co[1][1]morbidities.</li>
+                <li>Patients who stand discharged as per home isolation guidelines.</li>
+                <li>Patients being discharged from a COVID-19 facility as per revised discharge policy.</li>
+                <li>Individuals undertaking inter-state domestic travel.</li>
+            </ul> 
+            <p>CDC recommends that anyone with any signs or symptoms of COVID-19 get tested, regardless of vaccination status or prior infection. If you get tested because you have symptoms or were potentially exposed to the virus, you should stay away from others and follow the advice of your health care provider or a public health professional.</p>
+            
+            <div class="covit-box clearfix">
+                <div class="covit-left-right">
+                    <img src="@Url.Content("~/images/Kww96zC26lebk3nPWB1J.jpeg")">
+                </div>
+                <div class="covit-left-left">
+                    <h2>Molecular test (RT PCR test)</h2>
+                     <p>These diagnostic tests are considered the most sensitive for detecting SARS CoV2 infection</p>
+                    <p>You might take one if you or your doctor think you have COVID-19. You might also be asked to take this type of test if you need to prove to your employer or your college that you are not currently infected before returning to work or campus.</p>
+                    <p>Molecular tests are often called PCR tests, short for a polymerase chain reaction, the lab technique used to detect the virus's genetic material. In most cases, a health care provider will collect nasopharyngeal/oropharyngeal secretions from your nose or throat using a specialized swab. (Some molecular tests now use saliva/nasal secretions, which people may find more comfortable.) Turnaround time varies from minutes to days or longer, depending on whether the sample is analyzed onsite or sent to an outside lab.</p>
+                </div>
+             </div>
+       </div>
+    </div>
+</div>
+ 
+
+<!--=============== POPULER TEST SECTION ======================-->
+<div class="all-test-section-box">
+	<div class="clearfix">  
+            <div class="text-box">
+                <div class="title clearfix">
+                   <h3>Popular Test </h3>
+                   <div class="line"></div>
+                </div>
+                <ul class="clearfix">
+                    <li><a href="@Url.Action("CbcTest","Test")">CBC Test </a></li>
+                    <li><a href="@Url.Action("CbcTest","Test")">Amylase Test </a></li>
+                    <li><a href="@Url.Action("CbcTest","Test")">Bilirubin Test </a></li>
+                    <li><a href="@Url.Action("CbcTest","Test")">Blood Glucose Fasting (FBS) </a></li>
+                    <li><a href="@Url.Action("CbcTest","Test")">C-peptide Test </a></li>
+                    <li><a href="@Url.Action("CbcTest","Test")">CRP Test </a></li>
+                    <li><a href="@Url.Action("CbcTest","Test")">Dengue Test </a></li>
+                    <li><a href="@Url.Action("CbcTest","Test")">Ferritin Test </a></li>
+                    <li><a href="@Url.Action("CbcTest","Test")">Food Intolerance Test </a></li>
+                    <li><a href="@Url.Action("CbcTest","Test")">HbA1C test </a></li>
+                    <li><a href="@Url.Action("CbcTest","Test")">Iron Studies Test </a></li>
+                    <li><a href="@Url.Action("CbcTest","Test")">Liver Function Test </a></li>
+                    <li><a href="@Url.Action("CbcTest","Test")">Renal Function Test </a></li> 
+                </ul>
+            </div>
+            <div class="text-box">
+                <div class="title clearfix">
+                    <h3>Our Presence in Your City (NAVI MUMBAI)</h3> 
+                   <div class="line"></div>
+                </div> 
+            </div> 
+            <div class="text-box text-box-last">
+                <div class="title clearfix">
+                    <h3>Test by Health Conditions </h3> 
+                   <div class="line"></div>
+                </div>
+                <ul class="clearfix">
+                    <li><a href="@Url.Action("CbcTest","Test")">Pathology Lab in Mumbai</a></li>
+                    <li><a href="@Url.Action("CbcTest","Test")">Pathology Lab in Pune</a></li>
+                    <li><a href="@Url.Action("CbcTest","Test")">Pathology Lab in Rachi</a></li>
+                    <li><a href="@Url.Action("CbcTest","Test")">Pathology Lab in Kolkat</a></li>
+                    <li><a href="@Url.Action("CbcTest","Test")">Pathology Lab in Nashik</a></li>
+                    <li><a href="@Url.Action("CbcTest","Test")">Pathology Lab in Bhopal</a></li>
+                    <li><a href="@Url.Action("CbcTest","Test")">Pathology Lab in INdor</a></li>
+                    <li><a href="@Url.Action("CbcTest","Test")">Pathology Lab in Raipur</a></li>
+                    <li><a href="@Url.Action("CbcTest","Test")">Pathology Lab in Varanasi</a></li>
+                    <li><a href="@Url.Action("CbcTest","Test")">Pathology Lab in Jabalpur</a></li>
+                    <li><a href="@Url.Action("CbcTest","Test")">Pathology Lab in Hyderabad</a></li>
+                    <li><a href="@Url.Action("CbcTest","Test")">Pathology Lab in Channi</a></li>
+                    <li><a href="@Url.Action("CbcTest","Test")">Pathology Lab in Nagpur</a></li>
+                    <li><a href="@Url.Action("CbcTest","Test")">Pathology Lab in Siliguri</a></li> 
+                    <li><a href="@Url.Action("CbcTest","Test")">Pathology Lab in Guwahati</a></li> 
+                    <li><a href="@Url.Action("CbcTest","Test")">Pathology Lab in Kolhapur</a></li> 
+                    <li><a href="@Url.Action("CbcTest","Test")">Pathology Lab in Bengaluru</a></li> 
+                    <li><a href="@Url.Action("CbcTest","Test")">Pathology Lab in Derjeeling</a></li> 
+                    <li><a href="@Url.Action("CbcTest","Test")">Pathology Lab in Navi Mumbai</a></li> 
+                </ul>
+            </div> 
+    </div>
+</div>
+

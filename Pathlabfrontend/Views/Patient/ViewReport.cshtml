@@ -1,0 +1,84 @@
+@{
+    ViewBag.Title = "Shared Report";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section styles {
+<style>
+.vr-hero{background:linear-gradient(135deg,#4a1060,#1253be);padding:40px 20px;color:#fff;text-align:center}
+.vr-hero h1{font-size:26px;font-weight:800;margin-bottom:6px}
+.vr-hero p{opacity:.85;font-size:14px}
+.vr-wrap{max-width:680px;margin:40px auto;padding:0 20px}
+.vr-box{background:#fff;border:1px solid #e8e0f0;border-radius:18px;padding:36px;box-shadow:0 4px 24px rgba(99,44,118,.09)}
+.vr-badge{display:inline-flex;align-items:center;gap:6px;background:#fff3e0;color:#e65100;font-size:12px;font-weight:700;padding:6px 14px;border-radius:20px;margin-bottom:20px}
+.vr-info{background:#f8f5fc;border-radius:12px;padding:18px;margin-top:8px}
+.vr-info-row{display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid #ede8f5;font-size:14px;color:#555}
+.vr-info-row:last-child{border-bottom:none}
+.vr-info-row strong{color:#222;text-align:right}
+.vr-tests{margin-top:16px}
+.vr-tests h4{font-size:14px;color:#632c76;margin-bottom:10px}
+.vr-test-item{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #ede8f5;font-size:14px}
+.vr-test-item:last-child{border-bottom:none}
+.vr-spinner{text-align:center;padding:32px;color:#632c76}
+.vr-error{background:#fff3f3;border:1px solid #ffcdd2;border-radius:10px;padding:16px;text-align:center;color:#c62828;font-size:14px;font-weight:600;margin-top:20px}
+.vr-status-badge{padding:7px 18px;border-radius:24px;font-size:13px;font-weight:700;display:inline-block}
+.vr-status-ready{background:#e8f5e9;color:#2e7d32}
+.vr-status-pending{background:#fff8e1;color:#8a6d00}
+.vr-viewer{margin-top:20px;border:1px solid #e8e0f0;border-radius:12px;overflow:hidden}
+.vr-viewer iframe{width:100%;height:480px;border:none;display:block}
+.vr-footnote{font-size:12px;color:#999;text-align:center;margin-top:20px}
+</style>
+}
+
+<div data-ng-controller="ViewReportController">
+<input type="hidden" id="viewReportToken" value="@ViewBag.ReportToken"/>
+
+<div class="vr-hero">
+    <h1><i class="fa fa-file-text-o"></i> Shared Lab Report</h1>
+    <p>This is a secure, view-only summary shared by the patient — no login required</p>
+</div>
+
+<div class="vr-wrap">
+    <div class="vr-box">
+        <div class="vr-badge"><i class="fa fa-eye"></i> View only — this link cannot be used to download or edit the report</div>
+
+        <div class="vr-spinner" data-ng-show="isLoading">
+            <i class="fa fa-spinner fa-spin fa-2x"></i><p>Loading report...</p>
+        </div>
+
+        <div class="vr-error" data-ng-show="!isLoading && errorMsg">
+            <i class="fa fa-exclamation-triangle"></i> {{errorMsg}}
+        </div>
+
+        <div data-ng-show="!isLoading && booking">
+            <span class="vr-status-badge" data-ng-class="isReady ? 'vr-status-ready' : 'vr-status-pending'">
+                {{isReady ? 'Report Ready' : 'Report Pending'}}
+            </span>
+
+            <div class="vr-info">
+                <div class="vr-info-row"><span>Patient Name</span><strong>{{booking.PatientName}}</strong></div>
+                <div class="vr-info-row"><span>Booking Reference</span><strong>{{booking.BookingRef}}</strong></div>
+                <div class="vr-info-row" data-ng-show="booking.CollectionDate"><span>Collection Date</span><strong>{{booking.CollectionDate | date:'dd MMM yyyy'}}</strong></div>
+            </div>
+
+            <div class="vr-tests" data-ng-show="booking.Tests.length">
+                <h4><i class="fa fa-flask"></i> Tests Included</h4>
+                <div class="vr-test-item" data-ng-repeat="t in booking.Tests">
+                    <span>{{t.TestSuiteName}}</span>
+                    <span style="color:#888">{{t.SampleType}}</span>
+                </div>
+            </div>
+
+            <div class="vr-viewer" data-ng-show="isReady && reportUrl">
+                <iframe data-ng-src="{{reportUrl}}"></iframe>
+            </div>
+
+            <div class="vr-error" style="background:#fff8e1;border-color:#ffe082;color:#8a6d00" data-ng-show="!isReady">
+                <i class="fa fa-clock-o"></i> This report has not been published yet. Check back once the patient's report is marked Ready.
+            </div>
+        </div>
+    </div>
+    <p class="vr-footnote">Shared via the Swapnil Diagnostics Patient Portal &middot; Access is logged for the patient's records</p>
+</div>
+
+</div>
