@@ -18,6 +18,7 @@
     <link href="@Url.Content("~/Content/slick-theme.css")" rel="stylesheet" type="text/css">
     <link href="@v("~/Content/responsive.css")" rel="stylesheet" type="text/css">
     <script>var APP_ROOT = '@Url.Content("~/")';</script>
+    <script>var WCF_SERVICE_URL = '@System.Configuration.ConfigurationManager.AppSettings["WcfServiceUrl"]';</script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
     <script src="@Url.Content("~/Scripts/angular.min.js")" type="text/javascript"></script>
     <script src="@Url.Content("~/Scripts/angular-route.min.js")" type="text/javascript"></script>

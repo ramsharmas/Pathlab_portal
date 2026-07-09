@@ -1,8 +1,9 @@
 // LIMS API client — fetches tests/bookings/reports from WCfPathlabService.
 // Falls back to offline data if WCF is unreachable (dev/demo mode).
-// SWAP: change BASE to your IIS/production URL before go-live.
+// BASE comes from Web.config's WcfServiceUrl (emitted as WCF_SERVICE_URL in _Layout.cshtml)
+// so the production backend address can be changed via config, no code edit needed.
 (function(w){
-  var BASE = 'http://localhost:2091/PathlabService.svc';
+  var BASE = (typeof WCF_SERVICE_URL !== 'undefined' && WCF_SERVICE_URL) ? WCF_SERVICE_URL : 'http://localhost:2091/PathlabService.svc';
 
   // Offline fallback — mirrors the LabTests seed data.
   var FALLBACK_TESTS = [

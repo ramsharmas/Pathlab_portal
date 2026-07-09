@@ -121,7 +121,7 @@ jQuery(".search-icon").click(function(e){
 jQuery(".user-icon").click(function(e){
   e.preventDefault();
   var user = localStorage.getItem('sd_user');
-  window.location.href = user ? '/Patient/Portal' : '/Account/Login';
+  window.location.href = user ? APP_ROOT + 'Patient/Portal' : APP_ROOT + 'Account/Login';
 });
 
 jQuery(".report-status").click(function(e){ 

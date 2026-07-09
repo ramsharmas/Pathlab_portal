@@ -464,7 +464,7 @@ angular.module("PathlabModule")
                 : "Paid: Rs." + $scope.total() + (paymentId ? " (Txn " + paymentId + ")" : "") + ".";
             var msg = "Swapnil Diagnostics: Booking " + ref + " confirmed for " +
                 $scope.collectionDate + " " + $scope.timeSlot + ". " + payLine +
-                " Track your sample at " + window.location.origin + "/Patient/TrackSample";
+                " Track your sample at " + window.location.origin + APP_ROOT + "Patient/TrackSample";
             $scope.waConfirmLink = SDNotify.whatsappLink(msg);
         }
 
@@ -1015,7 +1015,7 @@ angular.module("PathlabModule")
             PathlabService.getOrCreateShareToken(r.BookingRef, patientId).then(function (resp) {
                 $scope.sharePanel.loading = false;
                 if (resp.data && resp.data.Success) {
-                    var link = window.location.origin + "/Patient/ViewReport?token=" + resp.data.Token;
+                    var link = window.location.origin + APP_ROOT + "Patient/ViewReport?token=" + resp.data.Token;
                     $scope.sharePanel.link = link;
                     $scope.sharePanel.waText = encodeURIComponent("View my lab report: " + link);
                 } else {
@@ -1274,7 +1274,7 @@ angular.module("PathlabModule")
                     $scope.booking = r.data;
                     $scope.isReady = (r.data.SampleStatus || 0) >= 4;
                     if ($scope.isReady) {
-                        $scope.reportUrl = $sce.trustAsResourceUrl("/Reports/" + r.data.BookingRef + ".pdf");
+                        $scope.reportUrl = $sce.trustAsResourceUrl(APP_ROOT + "Reports/" + r.data.BookingRef + ".pdf");
                     }
                     // Best-effort access log — never blocks the view if it fails.
                     PathlabService.logClientEvent("", null, "ReportViewedByDoctor", "Report", r.data.BookingRef, "Shared report link opened.")
