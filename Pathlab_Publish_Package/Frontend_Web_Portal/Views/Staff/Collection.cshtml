@@ -1,0 +1,95 @@
+@{
+    ViewBag.Title = "Collection Queue";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    bool staffAuthed = ViewBag.StaffAuthed == true;
+}
+
+@section styles {
+<style>
+.stf-wrap{max-width:520px;margin:0 auto;padding:20px 14px 60px}
+.stf-topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
+.stf-topbar h2{font-size:19px;font-weight:800;color:#2d0a3e;margin:0}
+.stf-refresh{background:#632c76;color:#fff;border:none;border-radius:8px;padding:10px 16px;font-size:13px;cursor:pointer}
+.stf-logout{background:none;border:none;color:#c62828;font-size:13px;cursor:pointer;padding:6px 0}
+.stf-card{background:#fff;border:1px solid #e8e0f0;border-radius:14px;padding:16px;margin-bottom:14px;box-shadow:0 2px 10px rgba(99,44,118,.06)}
+.stf-slot{font-size:13px;font-weight:700;color:#632c76;margin-bottom:4px}
+.stf-sample{font-size:12px;color:#888;margin-bottom:8px}
+.stf-name{font-size:17px;font-weight:700;color:#222;margin-bottom:2px}
+.stf-addr{font-size:13px;color:#555;margin-bottom:12px;line-height:1.4}
+.stf-actions{display:flex;gap:8px}
+.stf-call{flex:1;text-align:center;background:#fff;color:#1565c0;border:1.5px solid #1565c0;border-radius:35px 0 35px 35px;padding:12px;font-size:14px;font-weight:700;text-decoration:none}
+.stf-collected{flex:1;background:#2e7d32;color:#fff;border:none;border-radius:35px 0 35px 35px;padding:12px;font-size:14px;font-weight:700;cursor:pointer}
+.stf-empty{text-align:center;padding:50px 20px;color:#aaa}
+.stf-empty i{font-size:44px;display:block;margin-bottom:12px;color:#51ca62}
+.stf-gate{position:fixed;inset:0;background:rgba(13,4,22,.92);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px}
+.stf-gate-card{background:#fff;border-radius:20px;padding:40px 32px;width:100%;max-width:360px;box-shadow:0 24px 60px rgba(0,0,0,.5);text-align:center}
+.stf-gate-card .gate-icon{width:60px;height:60px;border-radius:16px;background:linear-gradient(135deg,#2d0a3e,#632c76);display:inline-flex;align-items:center;justify-content:center;margin-bottom:18px}
+.stf-gate-card h2{font-size:20px;font-weight:800;color:#2d0a3e;margin:0 0 4px}
+.stf-gate-card p{font-size:13px;color:#888;margin:0 0 22px}
+.stf-gate-card input[type=password]{width:100%;padding:13px 16px;border:1.5px solid #ddd;border-radius:10px;font-size:22px;letter-spacing:8px;text-align:center;margin-bottom:16px;outline:none;box-sizing:border-box}
+.stf-gate-card .gate-btn{width:100%;padding:13px;background:linear-gradient(135deg,#2d0a3e,#632c76);color:#fff;border:none;border-radius:10px;font-size:15px;font-weight:700;cursor:pointer}
+.stf-gate-card .gate-err{background:#fdecea;color:#c62828;border-radius:8px;padding:9px 14px;font-size:13px;margin-bottom:14px}
+.sd-toast{position:fixed;bottom:24px;left:50%;transform:translate(-50%,100px);z-index:999999;background:#632c76;color:#fff;padding:12px 20px;border-radius:10px;font-size:14px;font-weight:500;box-shadow:0 4px 20px rgba(0,0,0,.25);opacity:0;transition:all .35s ease;pointer-events:none;max-width:90vw}
+.sd-toast.show{transform:translate(-50%,0);opacity:1}
+.sd-toast.success{background:#2e7d32}
+.sd-toast.error{background:#c62828}
+</style>
+}
+
+@if (!staffAuthed)
+{
+    <div class="stf-gate">
+        <div class="stf-gate-card">
+            <div class="gate-icon"><i class="fa fa-motorcycle" style="font-size:24px;color:#fff"></i></div>
+            <h2>Phlebotomist Login</h2>
+            <p>Enter your PIN to see today's collection queue</p>
+            @if (TempData["LoginError"] != null)
+            {
+                <div class="gate-err"><i class="fa fa-exclamation-circle"></i> @TempData["LoginError"]</div>
+            }
+            @using (Html.BeginForm("Login", "Staff", FormMethod.Post))
+            {
+                @Html.AntiForgeryToken()
+                <input type="password" name="pin" placeholder="••••" autocomplete="current-password" maxlength="20" autofocus style="ime-mode:disabled" />
+                <button type="submit" class="gate-btn"><i class="fa fa-sign-in"></i> Enter</button>
+            }
+        </div>
+    </div>
+}
+else
+{
+    <div data-ng-controller="PhlebotomistController">
+    <div class="stf-wrap">
+        <div class="stf-topbar">
+            <h2><i class="fa fa-motorcycle"></i> Today's Queue</h2>
+            <button class="stf-refresh" data-ng-click="loadCollectionQueue()"><i class="fa fa-refresh" data-ng-class="{'fa-spin': isLoadingQueue}"></i></button>
+        </div>
+
+        <div data-ng-repeat="q in collectionQueue" class="stf-card">
+            <div class="stf-slot"><i class="fa fa-clock-o"></i> {{q.TimeSlot}}</div>
+            <div class="stf-sample">Sample ID: {{q.SampleId}}</div>
+            <div class="stf-name">{{q.PatientName}}</div>
+            <div class="stf-addr"><i class="fa fa-map-marker" style="color:#632c76"></i> {{q.Address}}</div>
+            <div class="stf-actions">
+                <a href="tel:{{q.PatientPhone}}" class="stf-call"><i class="fa fa-phone"></i> Call</a>
+                <button class="stf-collected" data-ng-click="markCollected(q)"><i class="fa fa-check"></i> Collected</button>
+            </div>
+        </div>
+
+        <div data-ng-show="isLoadingQueue" style="text-align:center;padding:40px;color:#632c76"><i class="fa fa-spinner fa-spin fa-2x"></i></div>
+        <div data-ng-show="!isLoadingQueue && collectionQueue.length==0" class="stf-empty">
+            <i class="fa fa-check-circle"></i>
+            All done — no home collections pending.
+        </div>
+
+        <div style="text-align:center;margin-top:20px">
+            @using (Html.BeginForm("Logout", "Staff", FormMethod.Post))
+            {
+                @Html.AntiForgeryToken()
+                <button type="submit" class="stf-logout"><i class="fa fa-sign-out"></i> Logout</button>
+            }
+        </div>
+    </div>
+    </div>
+    <div class="sd-toast" id="sdToast"></div>
+}

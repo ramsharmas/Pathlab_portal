@@ -57,7 +57,7 @@
                 <div class="header-icon-section">
                     <div class="header-icon"><a href="#" class="search-icon"></a></div>
                     <div class="header-icon"><a href="@Url.Action("Portal","Patient")" title="My Portal" class="user-icon"></a></div>
-                    <div class="header-icon"><a href="#" title="Logout" class="logout-icon"></a></div>
+                    <div class="header-icon"><a href="#" title="Logout" class="logout-icon" onclick="sessionStorage.removeItem('pathlabUser');localStorage.removeItem('sd_user');window.location.href='@Url.Action("Index","Home")';return false;"></a></div>
                     <div class="header-icon"><a href="@Url.Action("Cart","Booking")" title="Your Cart" class="cart-icon"></a></div>
                 </div>
             </div>
@@ -238,6 +238,7 @@
 </div>
 
 <script src="@Url.Content("~/Scripts/config.js")"></script>
+<script src="@Url.Content("~/Scripts/ga4.js")"></script>
 <script src="@Url.Content("~/Scripts/sd-notify.js")"></script>
 <script src="@Url.Content("~/Scripts/custom.js")"></script>
 @RenderSection("scripts", required: false)

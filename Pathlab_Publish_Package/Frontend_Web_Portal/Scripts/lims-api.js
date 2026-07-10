@@ -236,6 +236,16 @@
       return apiFetch('/GetAnalyticsSummary?from=' + (from||'') + '&to=' + (to||''));
     },
 
+    // Client-triggered audit events with no natural server round-trip (e.g. a
+    // login resolved entirely from the offline localStorage fallback, which
+    // never touches VerifyOtp and so is otherwise invisible to the audit trail).
+    logClientEvent: function(actor, actorPatientId, action, entityType, entityRef, detail) {
+      return apiFetch('/LogClientEvent', {method:'POST', body:JSON.stringify({
+        Actor: actor || '', ActorPatientId: actorPatientId || null,
+        Action: action, EntityType: entityType, EntityRef: entityRef, Detail: detail, Success: true
+      })});
+    },
+
     // Maps a portal registration (sd_user shape) to the field set required by
     // LIMS-Pathology User/New. Fields the patient never sees (Position,
     // Reference, Accounts, Username) are auto-filled with portal defaults so
