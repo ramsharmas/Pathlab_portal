@@ -539,6 +539,13 @@ angular.module("PathlabModule")
                 applyServerNotifs(r.data || []);
             });
             $scope.profileEdit = angular.copy($scope.currentUser);
+            // input[type=date] only renders when ng-model is a Date object (Angular's
+            // dateInputType formatter blanks anything that isn't) — currentUser stores
+            // DateOfBirth as a plain "yyyy-MM-dd" string, so convert it here.
+            if ($scope.profileEdit.DateOfBirth) {
+                var dob = new Date($scope.profileEdit.DateOfBirth);
+                $scope.profileEdit.DateOfBirth = isNaN(dob.getTime()) ? null : dob;
+            }
             startPushPolling();
             loadFamilyMembers();
             loadNotifPreferences();
@@ -601,9 +608,13 @@ angular.module("PathlabModule")
         // resulting session via sdGetUser(), it doesn't run its own OTP flow.
 
         $scope.saveProfile = function () {
-            PathlabService.updatePatient($scope.profileEdit).then(function (r) {
+            var payload = angular.copy($scope.profileEdit);
+            if (payload.DateOfBirth instanceof Date) {
+                payload.DateOfBirth = payload.DateOfBirth.toISOString().split("T")[0];
+            }
+            PathlabService.updatePatient(payload).then(function (r) {
                 if (r.data && r.data.Success) {
-                    $scope.currentUser = angular.extend($scope.currentUser, $scope.profileEdit);
+                    $scope.currentUser = angular.extend($scope.currentUser, payload);
                     sdSyncUser($scope.currentUser);
                     showToast("Profile updated!", "success");
                 } else {

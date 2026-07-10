@@ -742,6 +742,42 @@ namespace PathlabWcfService
                     familyMemberName = fm?.Name;
                 }
 
+                // Bookings.PatientId is a NOT NULL FK to Patients — a guest checkout
+                // (not logged in) arrives with PatientId 0, and a browser holding a
+                // stale localStorage/sessionStorage login (e.g. from before a DB
+                // reset) can arrive with a nonzero PatientId that no longer exists
+                // either. Either way the FK would blow up SaveChanges with an opaque
+                // DbUpdateException. Resolve it to a real patient by phone, auto-
+                // creating a minimal account (same password-from-phone fallback as
+                // RegisterPatient) so the guest can later OTP-login with this same
+                // phone number and see the booking.
+                if (dc.PatientId != 0 && !_db.Patients.Any(p => p.PatientId == dc.PatientId))
+                    dc.PatientId = 0;
+
+                if (dc.PatientId == 0 && !string.IsNullOrWhiteSpace(dc.PatientPhone))
+                {
+                    var existing = _db.Patients.FirstOrDefault(p => p.Phone == dc.PatientPhone);
+                    if (existing != null)
+                    {
+                        dc.PatientId = existing.PatientId;
+                    }
+                    else
+                    {
+                        var guest = new Patient
+                        {
+                            FullName = string.IsNullOrWhiteSpace(dc.PatientName) ? "Guest" : dc.PatientName,
+                            Phone = dc.PatientPhone,
+                            Email = dc.PatientEmail,
+                            PasswordHash = PasswordHelper.HashPassword(dc.PatientPhone),
+                            IsActive = true,
+                            CreatedDate = DateTime.Now
+                        };
+                        _db.Patients.Add(guest);
+                        _db.SaveChanges();
+                        dc.PatientId = guest.PatientId;
+                    }
+                }
+
                 // Slot-capacity gate: the UI greys out full slots, but this is the
                 // authoritative check so two simultaneous checkouts can't overbook.
                 if (!string.IsNullOrEmpty(dc.CollectionDate) && !string.IsNullOrEmpty(dc.TimeSlot))
@@ -862,7 +898,29 @@ namespace PathlabWcfService
             }
             catch (Exception ex)
             {
-                return new BookingDC { Success = false, Message = ex.Message };
+                var root = ex;
+                while (root.InnerException != null) root = root.InnerException;
+                System.Diagnostics.Trace.TraceError("[CreateBooking] " + ex.Message + " -> " + root.Message);
+                try
+                {
+                    string logPath = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "App_Data", "createbooking_debug.log");
+                    System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(logPath));
+                    string payload = "PatientId=" + dc.PatientId + " PatientName=" + dc.PatientName +
+                        " PatientPhone=" + dc.PatientPhone + " PatientEmail=" + dc.PatientEmail +
+                        " FamilyMemberId=" + dc.FamilyMemberId + " CollectionType=" + dc.CollectionType +
+                        " BranchName=" + dc.BranchName + " CollectionAddress=" + dc.CollectionAddress +
+                        " CollectionDate=" + dc.CollectionDate + " TimeSlot=" + dc.TimeSlot +
+                        " PromoCode=" + dc.PromoCode + " PaymentMethod=" + dc.PaymentMethod +
+                        " PaymentId=" + dc.PaymentId + " TotalAmount=" + dc.TotalAmount +
+                        " Tests=[" + string.Join(";", (dc.Tests ?? new List<BookingTestDC>()).Select(t =>
+                            "(TestSuiteID=" + t.TestSuiteID + ",Name=" + t.TestSuiteName + ",Price=" + t.Price +
+                            ",SampleType=" + t.SampleType + ",TestCount=" + t.TestCount + ")")) + "]";
+                    System.IO.File.AppendAllText(logPath,
+                        "==== " + DateTime.Now.ToString("s") + " ====\r\nPAYLOAD: " + payload +
+                        "\r\nEXCEPTION CHAIN:\r\n" + ex.ToString() + "\r\n\r\n");
+                }
+                catch { /* logging must never break the calling flow */ }
+                return new BookingDC { Success = false, Message = root.Message };
             }
         }
 
