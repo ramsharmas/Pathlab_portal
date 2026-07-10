@@ -117,6 +117,10 @@
         <div data-ng-show="activeTab=='dashboard'">
             <div class="sd-portal-card">
                 <h2><i class="fa fa-tachometer"></i> Dashboard</h2>
+                <div data-ng-show="dashboardLoadFailed" style="background:#fff3f3;color:#c53030;padding:10px 14px;border-radius:8px;margin-bottom:14px;display:flex;align-items:center;justify-content:space-between;gap:10px">
+                    <span><i class="fa fa-exclamation-triangle"></i> Couldn't load your latest bookings.</span>
+                    <button class="sd-btn-outline" style="padding:5px 14px;font-size:12px" data-ng-click="retryLoadPortalData()"><i class="fa fa-refresh"></i> Refresh</button>
+                </div>
                 <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px;margin-bottom:18px">
                     <div class="sd-stat-mini"><div class="num">{{bookings.length}}</div><div class="lbl">Total Bookings</div></div>
                     <div class="sd-stat-mini"><div class="num">{{activeBookingsCount()}}</div><div class="lbl">Active</div></div>

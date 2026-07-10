@@ -21,6 +21,10 @@ namespace Pathlabfrontend.Controllers
         {
             ViewBag.Title = "Admin Dashboard";
             ViewBag.AdminAuthed = IsAuthenticated;
+            // Only handed to the browser once the PIN gate has passed — this is what
+            // lets the Admin panel's AngularJS calls authenticate to the WCF
+            // service's admin-only endpoints (GetAdminStats, GetAllPatients, etc).
+            ViewBag.AdminApiKey = IsAuthenticated ? ConfigurationManager.AppSettings["AdminApiKey"] : null;
             return View();
         }
 

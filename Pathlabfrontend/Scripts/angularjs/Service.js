@@ -13,6 +13,21 @@ angular.module("PathlabModule")
         function get(url) {
             return $http({ method: "GET", url: baseUrl + url });
         }
+        // Admin-panel-only endpoints — ADMIN_API_KEY is emitted by
+        // Views/Admin/Dashboard.cshtml only after the session PIN gate passes,
+        // and must match WcfPathlabService/Web.config's AdminApiKey.
+        function adminGet(url) {
+            return $http({
+                method: "GET", url: baseUrl + url,
+                headers: { "X-Admin-Key": (typeof ADMIN_API_KEY !== 'undefined' && ADMIN_API_KEY) || "" }
+            });
+        }
+        function adminPost(url, data) {
+            return $http({
+                method: "POST", url: baseUrl + url, data: data,
+                headers: { "Content-Type": "application/json", "X-Admin-Key": (typeof ADMIN_API_KEY !== 'undefined' && ADMIN_API_KEY) || "" }
+            });
+        }
 
         // Patient
         this.sendOtp = function (phone) {
@@ -158,7 +173,7 @@ angular.module("PathlabModule")
         };
         // Reconciliation (Billing Phase 4)
         this.getReconciliationSummary = function (from, to) {
-            return get("GetReconciliationSummary?from=" + (from || "") + "&to=" + (to || ""));
+            return adminGet("GetReconciliationSummary?from=" + (from || "") + "&to=" + (to || ""));
         };
         // Doctor sharing (Report Delivery Phase 3)
         this.shareReportWithDoctor = function (bookingRef, doctorName, doctorEmail) {
@@ -177,50 +192,50 @@ angular.module("PathlabModule")
             return post("SubmitHomeCollectionLead", { Name: name, Mobile: mobile, City: city });
         };
         this.getHomeCollectionLeads = function () {
-            return get("GetHomeCollectionLeads");
+            return adminGet("GetHomeCollectionLeads");
         };
 
         // Admin
         this.getAdminStats = function () {
-            return get("GetAdminStats");
+            return adminGet("GetAdminStats");
         };
         this.getAllPatients = function () {
-            return get("GetAllPatients");
+            return adminGet("GetAllPatients");
         };
         this.getAllBookings = function () {
-            return get("GetAllBookings");
+            return adminGet("GetAllBookings");
         };
         this.getStaffAlerts = function () {
-            return get("GetStaffAlerts");
+            return adminGet("GetStaffAlerts");
         };
         this.getNotificationLogs = function () {
-            return get("GetNotificationLogs");
+            return adminGet("GetNotificationLogs");
         };
         this.getNotificationsByPatient = function (patientId) {
             return get("GetNotificationsByPatient/" + patientId);
         };
         // Website+LIMS integration health (Analytics Phase 2 stand-in for combined BI)
         this.getLimsSyncStatus = function () {
-            return get("GetLimsSyncStatus");
+            return adminGet("GetLimsSyncStatus");
         };
         this.syncTestCatalogue = function () {
-            return post("SyncTestCatalogue", {});
+            return adminPost("SyncTestCatalogue", {});
         };
         // TAT / revenue trend / test volume (Analytics Phase 3)
         this.getAnalyticsSummary = function (from, to) {
-            return get("GetAnalyticsSummary?from=" + (from || "") + "&to=" + (to || ""));
+            return adminGet("GetAnalyticsSummary?from=" + (from || "") + "&to=" + (to || ""));
         };
         // Flat export for a BI tool's Web/REST connector (Analytics Phase 4)
         this.getAnalyticsExport = function (from, to) {
-            return get("GetAnalyticsExport?from=" + (from || "") + "&to=" + (to || ""));
+            return adminGet("GetAnalyticsExport?from=" + (from || "") + "&to=" + (to || ""));
         };
 
         // Audit trail
         this.getAuditLogs = function () {
-            return get("GetAuditLogs");
+            return adminGet("GetAuditLogs");
         };
         this.verifyAuditChain = function () {
-            return get("VerifyAuditChain");
+            return adminGet("VerifyAuditChain");
         };
         this.logClientEvent = function (actor, actorPatientId, action, entityType, entityRef, detail) {
             return post("LogClientEvent", {
@@ -230,7 +245,7 @@ angular.module("PathlabModule")
         };
         // Supporting documentation for an NABH/NABL audit — not a certified audit (Phase 4)
         this.getComplianceReport = function () {
-            return get("GetComplianceReport");
+            return adminGet("GetComplianceReport");
         };
 
         // Feedback / complaints (Help section fix) — real, self-hosted, not the
@@ -239,6 +254,6 @@ angular.module("PathlabModule")
             return post("SubmitFeedback", data);
         };
         this.getAllFeedback = function () {
-            return get("GetAllFeedback");
+            return adminGet("GetAllFeedback");
         };
     });

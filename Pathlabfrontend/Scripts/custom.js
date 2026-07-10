@@ -213,14 +213,29 @@ jQuery(".cross").click(function(){
  
 
 /*--
-forgot 
+forgot
 ------------------------*/
 jQuery(".forgot").click(function(){
-  $(".log-form") .hide() 
-  $(".forgot-form") .show() 
+  $(".log-form") .hide()
+  $(".forgot-form") .show()
 });
 jQuery(".cross-three").click(function(){
-  $(".forgot-form") .hide()  
+  $(".forgot-form") .hide()
+});
+
+/*--
+Nav mega-menu: force-close on scroll
+------------------------*/
+// .sub-menu opens on CSS :hover. Browsers only recompute :hover on real
+// pointer events, not on scroll — so if the cursor stays put over the
+// trigger while the page is scrolled (mouse wheel/trackpad), the dropdown
+// stays visually open and floats over the content below. Toggling display
+// off then back to the CSS default on scroll forces it shut without
+// blocking the next genuine hover.
+jQuery(window).on('scroll', function () {
+  jQuery('.menu-section .sub-menu:visible').css('display', 'none').each(function () {
+    jQuery(this).css('display', '');
+  });
 });
 
  

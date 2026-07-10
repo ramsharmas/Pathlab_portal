@@ -15,4 +15,4 @@ C:\Users\Mudit\Desktop\PathlabPortal\WcfPathlabService\obj\Debug\PathlabWcfServi
 C:\Users\Mudit\Desktop\PathlabPortal\WcfPathlabService\obj\Debug\PathlabWcfService.dll
 C:\Users\Mudit\Desktop\PathlabPortal\WcfPathlabService\obj\Debug\PathlabWcfService.pdb
 C:\Users\Mudit\Desktop\PathlabPortal\WcfPathlabService\bin\System.Runtime.CompilerServices.Unsafe.dll
-C:\Users\Mudit\Desktop\PathlabPortal\WcfPathlabService\obj\Debug\PathlabW.6A72FA9E.Up2Date
+C:\Users\Mudit\Desktop\PathlabPortal\WcfPathlabService\obj\Debug\PathlabWcfService.csproj.CopyComplete

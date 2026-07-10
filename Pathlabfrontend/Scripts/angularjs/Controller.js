@@ -463,6 +463,22 @@ angular.module("PathlabModule")
                     $scope.confirmedRef = r.data.BookingRef;
                     $scope.confirmedSampleId = r.data.SampleId;
                     $scope.step = 3;
+
+                    // Server-side CreateBooking resolves/auto-creates the real
+                    // PatientId by phone when the client arrives with PatientId 0
+                    // or a stale one (see PathlabService.svc.cs CreateBooking).
+                    // The booking itself always lands on the correct patient —
+                    // but if we don't write that resolved id back into local
+                    // storage, every later page (Portal dashboard, My Bookings)
+                    // keeps querying under the old/blank id and shows nothing,
+                    // even though the booking genuinely exists server-side.
+                    if (r.data.PatientId && (!user || user.PatientId !== r.data.PatientId)) {
+                        user = user || {};
+                        user.PatientId = r.data.PatientId;
+                        user.FullName = user.FullName || r.data.PatientName;
+                        user.Phone = user.Phone || r.data.PatientPhone;
+                        sdSyncUser(user);
+                    }
                     trackGa("purchase", {
                         transaction_id: r.data.BookingRef, currency: "INR",
                         value: $scope.total(), items: $scope.cart.map(gaItem)
@@ -525,13 +541,33 @@ angular.module("PathlabModule")
 
         if ($scope.currentUser) loadPortalData();
 
-        function loadPortalData() {
-            $scope.isLoading = true;
+        // getBookingsByPatient had no failure handler: a single transient WCF
+        // hiccup (common right after checkout, when this page loads seconds
+        // after CreateBooking) left $scope.bookings at its [] default forever —
+        // dashboard silently stuck at "0 Total Bookings" with no error and no
+        // way to recover short of a manual refresh. Retry once, then surface it.
+        $scope.dashboardLoadFailed = false;
+        function loadBookings(isRetry) {
             PathlabService.getBookingsByPatient($scope.currentUser.PatientId).then(function (r) {
                 $scope.bookings = r.data || [];
                 $scope.isLoading = false;
+                $scope.dashboardLoadFailed = false;
                 buildNotifications();
+            }, function () {
+                if (!isRetry) {
+                    $window.setTimeout(function () { $scope.$apply(function () { loadBookings(true); }); }, 1500);
+                } else {
+                    $scope.isLoading = false;
+                    $scope.dashboardLoadFailed = true;
+                    showToast("Couldn't load your bookings. Tap Refresh to try again.", "error");
+                }
             });
+        }
+        $scope.retryLoadPortalData = function () { $scope.isLoading = true; loadPortalData(); };
+
+        function loadPortalData() {
+            $scope.isLoading = true;
+            loadBookings(false);
             PathlabService.getReportsByPatient($scope.currentUser.PatientId).then(function (r) {
                 $scope.reports = r.data || [];
             });

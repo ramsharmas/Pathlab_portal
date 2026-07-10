@@ -30,6 +30,22 @@ namespace PathlabWcfService
             return supplied == configured;
         }
 
+        // Admin-dashboard-facing read/action endpoints check this. The MVC Admin
+        // page (Pathlabfrontend/Controllers/AdminController.cs) gates the page
+        // itself behind a session PIN, but that session lives in a different
+        // process/app pool from this WCF service — it can't see it. Without this,
+        // anyone who knew (or guessed) one of these method names could call it
+        // directly and read every patient's PII or full revenue figures with no
+        // login at all. Same fail-closed shape as IsPartnerAuthorized: an unset
+        // AdminApiKey means "nobody gets in", never "anyone gets in".
+        private static bool IsAdminAuthorized()
+        {
+            string configured = ConfigurationManager.AppSettings["AdminApiKey"];
+            if (string.IsNullOrWhiteSpace(configured)) return false;
+            string supplied = WebOperationContext.Current?.IncomingRequest.Headers["X-Admin-Key"];
+            return supplied == configured;
+        }
+
         // ── PATIENT / AUTH ────────────────────────────────────────────────
         public PatientDC SendOtp(PatientDC dc)
         {
@@ -39,8 +55,17 @@ namespace PathlabWcfService
                 return new PatientDC { Success = false, Message = "Invalid phone number." };
             }
 
-            string otp = "123456"; // demo fixed OTP
+            // Real OTP once Fast2SmsApiKey is set; fixed "123456" in demo/offline
+            // mode so login still works without a live SMS gateway.
+            bool smsConfigured = !string.IsNullOrWhiteSpace(ConfigurationManager.AppSettings["Fast2SmsApiKey"]);
+            string otp = smsConfigured ? new Random().Next(100000, 999999).ToString() : "123456";
             lock (_otpStore) { _otpStore[dc.Phone] = otp; }
+
+            if (smsConfigured)
+            {
+                SmsHelper.Send(dc.Phone, "Your Pathlab login OTP is " + otp + ". Valid for 10 minutes.", "OTP");
+            }
+
             AuditHelper.Log(dc.Phone, null, "OtpRequested", "Patient", dc.Phone, "OTP sent.", true);
             return new PatientDC { Success = true, Message = "OTP sent successfully." };
         }
@@ -459,6 +484,8 @@ namespace PathlabWcfService
         // Price=0 so staff can fill those in before they go live on the site.
         public LimsSyncResultDC SyncTestCatalogue()
         {
+            if (!IsAdminAuthorized())
+                return new LimsSyncResultDC { Success = false, Message = "Not authorized." };
             try
             {
                 var entries = LimsClient.FetchCatalogue();
@@ -1560,6 +1587,7 @@ namespace PathlabWcfService
         // the gateway statement (PaymentRef) and the LIMS (LimsSyncStatus).
         public ReconciliationSummaryDC GetReconciliationSummary(string from, string to)
         {
+            if (!IsAdminAuthorized()) return new ReconciliationSummaryDC { Rows = new List<ReconciliationRowDC>() };
             DateTime toDate;
             if (!DateTime.TryParse(to, out toDate)) toDate = DateTime.Today;
             DateTime fromDate;
@@ -1630,6 +1658,7 @@ namespace PathlabWcfService
 
         public List<FeedbackDC> GetAllFeedback()
         {
+            if (!IsAdminAuthorized()) return new List<FeedbackDC>();
             return _db.Feedbacks.OrderByDescending(f => f.CreatedAt)
                 .Select(f => new FeedbackDC
                 {
@@ -1676,6 +1705,7 @@ namespace PathlabWcfService
 
         public List<HomeCollectionLeadDC> GetHomeCollectionLeads()
         {
+            if (!IsAdminAuthorized()) return new List<HomeCollectionLeadDC>();
             return _db.HomeCollectionLeads.OrderByDescending(l => l.CreatedAt)
                 .Select(l => new HomeCollectionLeadDC
                 {
@@ -1687,6 +1717,7 @@ namespace PathlabWcfService
         // ── ADMIN ─────────────────────────────────────────────────────────
         public AdminStatsDC GetAdminStats()
         {
+            if (!IsAdminAuthorized()) return new AdminStatsDC();
             var today = DateTime.Today;
             var monthStart = new DateTime(today.Year, today.Month, 1);
             return new AdminStatsDC
@@ -1702,6 +1733,7 @@ namespace PathlabWcfService
 
         public List<PatientDC> GetAllPatients()
         {
+            if (!IsAdminAuthorized()) return new List<PatientDC>();
             return _db.Patients.Where(p => p.IsActive)
                 .OrderByDescending(p => p.CreatedDate)
                 .Select(p => new PatientDC
@@ -1715,6 +1747,7 @@ namespace PathlabWcfService
 
         public List<BookingDC> GetAllBookings()
         {
+            if (!IsAdminAuthorized()) return new List<BookingDC>();
             return _db.Bookings.Include("Patient").Include("Tests")
                 .OrderByDescending(b => b.CreatedAt)
                 .ToList().Select(b => MapBooking(b, false)).ToList();
@@ -1722,6 +1755,7 @@ namespace PathlabWcfService
 
         public List<StaffAlertDC> GetStaffAlerts()
         {
+            if (!IsAdminAuthorized()) return new List<StaffAlertDC>();
             var alerts = new List<StaffAlertDC>();
             var now = DateTime.Now;
             var active = _db.Bookings.Include("Patient")
@@ -1773,6 +1807,7 @@ namespace PathlabWcfService
 
         public List<NotificationLogDC> GetNotificationLogs()
         {
+            if (!IsAdminAuthorized()) return new List<NotificationLogDC>();
             return _db.NotificationLogs.OrderByDescending(n => n.CreatedAt).Take(200)
                 .Select(n => new NotificationLogDC
                 {
@@ -1862,6 +1897,7 @@ namespace PathlabWcfService
         // how much of the portal side has actually synced instead.
         public LimsSyncStatusDC GetLimsSyncStatus()
         {
+            if (!IsAdminAuthorized()) return new LimsSyncStatusDC();
             return new LimsSyncStatusDC
             {
                 LimsConfigured = !string.IsNullOrWhiteSpace(ConfigurationManager.AppSettings["LimsBaseUrl"]),
@@ -1879,6 +1915,8 @@ namespace PathlabWcfService
         // to the last 30 days when omitted or unparsable.
         public AnalyticsSummaryDC GetAnalyticsSummary(string from, string to)
         {
+            if (!IsAdminAuthorized())
+                return new AnalyticsSummaryDC { DailyTrend = new List<DayMetricDC>(), TestVolume = new List<TestVolumeDC>() };
             DateTime toDate;
             if (!DateTime.TryParse(to, out toDate)) toDate = DateTime.Today;
             DateTime fromDate;
@@ -1931,6 +1969,7 @@ namespace PathlabWcfService
         // wiring it into a live workspace is the user's own license/account.
         public List<AnalyticsExportRowDC> GetAnalyticsExport(string from, string to)
         {
+            if (!IsAdminAuthorized()) return new List<AnalyticsExportRowDC>();
             DateTime toDate;
             if (!DateTime.TryParse(to, out toDate)) toDate = DateTime.Today;
             DateTime fromDate;
@@ -1952,6 +1991,7 @@ namespace PathlabWcfService
         // ── AUDIT TRAIL ───────────────────────────────────────────────────
         public List<AuditLogDC> GetAuditLogs()
         {
+            if (!IsAdminAuthorized()) return new List<AuditLogDC>();
             return _db.AuditLogs.OrderByDescending(a => a.AuditLogId).Take(300)
                 .Select(a => new AuditLogDC
                 {
@@ -1963,6 +2003,7 @@ namespace PathlabWcfService
 
         public AuditVerifyResultDC VerifyAuditChain()
         {
+            if (!IsAdminAuthorized()) return new AuditVerifyResultDC();
             return AuditHelper.VerifyChain();
         }
 
@@ -1986,6 +2027,7 @@ namespace PathlabWcfService
         // chain-of-custody trail vs. a gap.
         public ComplianceReportDC GetComplianceReport()
         {
+            if (!IsAdminAuthorized()) return new ComplianceReportDC();
             var chain = AuditHelper.VerifyChain();
             var bookingIds = _db.Bookings.Select(b => b.BookingId).ToList();
             var custodyBookingIds = _db.CustodyEvents.Select(e => e.BookingId).Distinct().ToList();

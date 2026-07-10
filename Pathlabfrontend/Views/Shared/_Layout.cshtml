@@ -31,20 +31,32 @@
 <body data-ng-app="PathlabModule">
 
 <!--=============== SIDE BAR ======================-->
-<div class="side-bar">
-    <div class="side-bar-box" style="cursor:pointer" onclick="window.location.href='@Url.Action("BookTest","Test")'">
-        <img src="@Url.Content("~/images/tube-icon-02.png")"><p>Book a Test</p>
+@{
+    var routeController = ViewContext.RouteData.Values["controller"]?.ToString();
+    var routeAction = ViewContext.RouteData.Values["action"]?.ToString();
+    // Admin has no use for patient quick-links; the Patient Portal already has
+    // this exact set (Book a Test / Track Sample / Reports) in its own sidebar,
+    // so the floating widget there is pure duplication that overlaps content
+    // (e.g. covers the booking status badge on My Bookings).
+    var hideSideBar = routeController == "Admin" || (routeController == "Patient" && routeAction == "Portal");
+}
+@if (!hideSideBar)
+{
+    <div class="side-bar">
+        <div class="side-bar-box" style="cursor:pointer" onclick="window.location.href='@Url.Action("BookTest","Test")'">
+            <img src="@Url.Content("~/images/tube-icon-02.png")"><p>Book a Test</p>
+        </div>
+        <div class="side-bar-box">
+            <a href="@Url.Action("CentreLocator","Company")"><img src="@Url.Content("~/images/map-mark.png")"><p>Centre / Lab Locator</p></a>
+        </div>
+        <div class="side-bar-box" style="cursor:pointer" onclick="window.location.href='@Url.Action("Portal","Patient")?tab=reports'">
+            <img src="@Url.Content("~/images/report.png")"><p>Download Reports</p>
+        </div>
+        <div class="side-bar-box" style="cursor:pointer" onclick="window.location.href='@Url.Action("TrackSample","Patient")'">
+            <img src="@Url.Content("~/images/report.png")"><p>Track Your Sample</p>
+        </div>
     </div>
-    <div class="side-bar-box">
-        <a href="@Url.Action("CentreLocator","Company")"><img src="@Url.Content("~/images/map-mark.png")"><p>Centre / Lab Locator</p></a>
-    </div>
-    <div class="side-bar-box" style="cursor:pointer" onclick="window.location.href='@Url.Action("Portal","Patient")?tab=reports'">
-        <img src="@Url.Content("~/images/report.png")"><p>Download Reports</p>
-    </div>
-    <div class="side-bar-box" style="cursor:pointer" onclick="window.location.href='@Url.Action("TrackSample","Patient")'">
-        <img src="@Url.Content("~/images/report.png")"><p>Track Your Sample</p>
-    </div>
-</div>
+}
 
 <!--=============== HEADER ======================-->
 <div class="main-body-box clearfix">
