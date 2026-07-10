@@ -431,6 +431,23 @@ angular.module("PathlabModule")
             $scope.isProcessing = true;
 
             var patientId = user ? user.PatientId : 0;
+
+            // Always send CollectionDate as a plain "YYYY-MM-DD" string.
+            // Angular's input[type=date] ng-model gives back a JS Date object
+            // when the user picks a date, which JSON.stringify encodes as a full
+            // ISO timestamp ("2026-07-15T00:00:00.000Z"). The WCF service side
+            // DateTime.Parse succeeds on the ISO form but the date comes through
+            // shifted by the UTC offset on the server, causing bookings to land
+            // on the wrong calendar day. Stripping to YYYY-MM-DD avoids that and
+            // keeps the parse simple on both sides.
+            var rawDate = $scope.collectionDate;
+            var collDateStr = "";
+            if (rawDate instanceof Date) {
+                collDateStr = rawDate.toLocaleDateString('en-CA'); // YYYY-MM-DD
+            } else if (typeof rawDate === 'string' && rawDate) {
+                collDateStr = rawDate.split('T')[0]; // strip time if present
+            }
+
             var bookingData = {
                 PatientId: patientId,
                 PatientName: $scope.patient.FullName,
@@ -440,7 +457,7 @@ angular.module("PathlabModule")
                 CollectionType: $scope.collectionType,
                 CollectionAddress: $scope.collectionType === "home" ? $scope.homeAddress : $scope.branchName,
                 BranchName: $scope.collectionType === "walkin" ? $scope.branchName : null,
-                CollectionDate: $scope.collectionDate,
+                CollectionDate: collDateStr,
                 TimeSlot: $scope.timeSlot,
                 PaymentMethod: $scope.payMethod,
                 PaymentId: paymentId,
@@ -644,9 +661,20 @@ angular.module("PathlabModule")
         // resulting session via sdGetUser(), it doesn't run its own OTP flow.
 
         $scope.saveProfile = function () {
+            // Guard: if the patient logged in via offline/demo mode, PatientId
+            // will be 0, and the WCF UpdatePatient endpoint requires a real DB
+            // row to update. Show a clear message rather than silently failing.
+            if (!$scope.profileEdit || !$scope.profileEdit.PatientId) {
+                showToast("Please log out and log in again to save profile changes.", "error");
+                return;
+            }
             var payload = angular.copy($scope.profileEdit);
+            // Normalise DateOfBirth: Angular gives a Date object from input[type=date],
+            // the WCF deserialiser needs a plain YYYY-MM-DD string.
             if (payload.DateOfBirth instanceof Date) {
-                payload.DateOfBirth = payload.DateOfBirth.toISOString().split("T")[0];
+                payload.DateOfBirth = payload.DateOfBirth.toLocaleDateString('en-CA');
+            } else if (typeof payload.DateOfBirth === 'string' && payload.DateOfBirth.includes('T')) {
+                payload.DateOfBirth = payload.DateOfBirth.split('T')[0];
             }
             PathlabService.updatePatient(payload).then(function (r) {
                 if (r.data && r.data.Success) {
@@ -654,8 +682,10 @@ angular.module("PathlabModule")
                     sdSyncUser($scope.currentUser);
                     showToast("Profile updated!", "success");
                 } else {
-                    showToast("Update failed. Please try again.", "error");
+                    showToast((r.data && r.data.Message) || "Update failed. Please try again.", "error");
                 }
+            }, function () {
+                showToast("Unable to reach service. Please try again.", "error");
             });
         };
 
